@@ -1,0 +1,378 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Virtual over Assisted Installer - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Virtual over Assisted Installer">
+<meta property="og:description" content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI
+To have a full reference there&rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over Assisted Installer. This lab uses sushy-tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready Assisted Installer Operator ready  Install sushy-tools &nbsp;Information If you&rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -> you could omit this step because it is already installed.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Virtual over Assisted Installer">
+<meta name=twitter:description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI
+To have a full reference there&rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over Assisted Installer. This lab uses sushy-tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready Assisted Installer Operator ready  Install sushy-tools &nbsp;Information If you&rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -> you could omit this step because it is already installed.">
+<meta itemprop=name content="Virtual over Assisted Installer">
+<meta itemprop=description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI
+To have a full reference there&rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over Assisted Installer. This lab uses sushy-tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready Assisted Installer Operator ready  Install sushy-tools &nbsp;Information If you&rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -> you could omit this step because it is already installed.">
+<meta itemprop=wordCount content="781"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="Assisted Installer,labs,Virtual Baremetal,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Virtual over Assisted Installer</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#reference>Reference</a></li>
+<li><a href=#scenario-description>Scenario Description</a></li>
+<li><a href=#requirements>Requirements</a></li>
+<li><a href=#install-sushy-tools>Install sushy-tools</a></li>
+<li><a href=#create-the-vm-host>Create the VM (host)</a></li>
+<li><a href=#modify-the-baremetalhost-yaml>Modify the <code>BareMetalHost</code> YAML</a>
+<ul>
+<li><a href=#approve-the-agent-now-is-not-necessary--auto-approve-is-ready>approve the agent (Now, is not necessary-> auto-approve is ready)</a></li>
+</ul>
+</li>
+<li><a href=#installation-starting>Installation starting</a></li>
+<li><a href=#installation-finished>Installation Finished</a></li>
+</ul>
+</nav></aside>
+<h2 id=reference>Reference</h2>
+<p>Deploy Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI>https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI</a></p>
+<p>To have a full reference there&rsquo;s a <a href=https://github.com/RHsyseng/labs-index/blob/master/deploy-BMHost-virtual-over-AI/deploy.sh>deploy script</a> inside the deploy folder mentioned before, with all the steps shown here.</p>
+<h2 id=scenario-description>Scenario Description</h2>
+<p>The main goal of this document is to explain the deployment of a baremetal host over Assisted Installer.
+This lab uses sushy-tools to emulate the same situation which we could found using a real Baremetal host.</p>
+<h2 id=requirements>Requirements</h2>
+<ul>
+<li>Hub cluster deployed successfully</li>
+<li>LocalStorage ready</li>
+<li>Hive operator ready</li>
+<li>Assisted Installer Operator ready</li>
+</ul>
+<h2 id=install-sushy-tools>Install sushy-tools</h2>
+<div class="panel panel-notice"><div class=panel-header>
+<h3><i class="fas fa-info-circle"></i>&nbsp;Information</h3>
+</div><div class=panel-body>
+If you&rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -> you could omit this step because it is already installed.
+</div>
+</div>
+<p>This will create a service running in the port <code>:8000</code> which will be the emulation for the Redfish protocol</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>dnf -y install pkgconf-pkg-config libvirt-devel gcc python3-libvirt python3 git
+pip3 install sushy-tools
+IP<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>ip -o addr show eth0 | head -1 | awk <span style=color:#e6db74>&#39;{print $4}&#39;</span> | cut -d <span style=color:#e6db74>&#34;/&#34;</span> -f <span style=color:#ae81ff>1</span> | head -1<span style=color:#66d9ef>)</span>
+sed -i <span style=color:#e6db74>&#34;s/127.0.0.1/</span>$IP<span style=color:#e6db74>/&#34;</span> /etc/sushy.conf
+<span style=color:#75715e># cp /root/bin/sushy.service  /usr/lib/systemd/system</span>
+<span style=color:#75715e># restorecon -Frv /usr/lib/systemd/system/sushy.service</span>
+systemctl enable --now sushy
+sleep <span style=color:#ae81ff>20</span>
+ssh-keyscan -H <span style=color:#f92672>{{</span> config_host <span style=color:#f92672>}}</span> &gt;&gt; /root/.ssh/known_hosts
+echo -e <span style=color:#e6db74>&#34;Host=*\nStrictHostKeyChecking=no\n&#34;</span> &gt; /root/.ssh/config
+python3 /root/bin/sushy.py
+
+</code></pre></div><p>At this point make sure you have the next option by default:</p>
+<pre tabindex=0><code>SUSHY_EMULATOR_IGNORE_BOOT_DEVICE = True
+</code></pre><h2 id=create-the-vm-host>Create the VM (host)</h2>
+<p>Create the image with <code>uefi=true</code> and <code>start=false</code> because we&rsquo;re gonna use the sushy tools. If you&rsquo;re using a SNO only have to use one of them.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>kcli --debug create vm -P uefi_legacy<span style=color:#f92672>=</span>true -P start<span style=color:#f92672>=</span>false -P nets<span style=color:#f92672>=[</span><span style=color:#e6db74>&#39;{&#34;name&#34;:&#34;bare-net&#34;, &#34;mac&#34;:&#34;ee:bb:aa:ee:1e:1a&#34;}&#39;</span><span style=color:#f92672>]</span> -P memory<span style=color:#f92672>=</span><span style=color:#ae81ff>38000</span> -P numcpus<span style=color:#f92672>=</span><span style=color:#ae81ff>8</span> -P disks<span style=color:#f92672>=[</span>180<span style=color:#f92672>]</span> agent1
+kcli --debug create vm -P uefi_legacy<span style=color:#f92672>=</span>true -P start<span style=color:#f92672>=</span>false -P nets<span style=color:#f92672>=[</span><span style=color:#e6db74>&#39;{&#34;name&#34;:&#34;bare-net&#34;, &#34;mac&#34;:&#34;ee:bb:aa:ee:1e:1b&#34;}&#39;</span><span style=color:#f92672>]</span> -P memory<span style=color:#f92672>=</span><span style=color:#ae81ff>38000</span> -P numcpus<span style=color:#f92672>=</span><span style=color:#ae81ff>8</span> -P disks<span style=color:#f92672>=[</span>180<span style=color:#f92672>]</span> agent2
+kcli --debug create vm -P uefi_legacy<span style=color:#f92672>=</span>true -P start<span style=color:#f92672>=</span>false -P nets<span style=color:#f92672>=[</span><span style=color:#e6db74>&#39;{&#34;name&#34;:&#34;bare-net&#34;, &#34;mac&#34;:&#34;ee:bb:aa:ee:1e:1c&#34;}&#39;</span><span style=color:#f92672>]</span> -P memory<span style=color:#f92672>=</span><span style=color:#ae81ff>38000</span> -P numcpus<span style=color:#f92672>=</span><span style=color:#ae81ff>8</span> -P disks<span style=color:#f92672>=[</span>180<span style=color:#f92672>]</span> agent3
+
+sleep <span style=color:#ae81ff>2</span>
+
+virsh dumpxml agent1 | grep -i uuid
+echo; echo; echo;
+virsh dumpxml agent2 | grep -i uuid
+echo; echo; echo;
+virsh dumpxml agent3 | grep -i uuid
+</code></pre></div><p>Then the idea is to get the UUID (from the head of the file) from the VM:
+To do that we&rsquo;ve prepared the <code>04-create-new-vm.sh</code> script</p>
+<h2 id=modify-the-baremetalhost-yaml>Modify the <code>BareMetalHost</code> YAML</h2>
+<p>Now, the idea is to prepare the BMH which we&rsquo;re gonna create in order to wait until the VM is ready.</p>
+<p>To do that, the operator is looking for the agent UUID and the MAC address.
+If both flags match with the information we&rsquo;re gonna load, we will move forward next step.</p>
+<p>Take a look to the MAC, the UUID at the end of the address and the <code>discovery.iso</code> HTTPD file server which we&rsquo;ve created before</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>bmc-secret1</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>password</span>: <span style=color:#ae81ff>YWxrbm9wZmxlcgo=</span>
+  <span style=color:#f92672>username</span>: <span style=color:#ae81ff>YW1vcmdhbnQK</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Opaque</span>
+
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>metal3.io/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>BareMetalHost</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-agent1</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>infraenvs.agent-install.openshift.io</span>: <span style=color:#e6db74>&#34;lab-env&#34;</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>inspect.metal3.io</span>: <span style=color:#ae81ff>disabled</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>online</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bmc</span>:
+    <span style=color:#f92672>address</span>: <span style=color:#ae81ff>redfish-virtualmedia+http://INSTALLER_IP:8000/redfish/v1/Systems/AGENT1</span>
+    <span style=color:#f92672>credentialsName</span>: <span style=color:#ae81ff>bmc-secret1</span>
+    <span style=color:#f92672>disableCertificateVerification</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bootMACAddress</span>: <span style=color:#ae81ff>ee:bb:aa:ee:1e:1a</span>
+  <span style=color:#f92672>automatedCleaningMode</span>: <span style=color:#ae81ff>disabled</span>
+</code></pre></div><p>Once the YAML with the <code>BareMetalHost</code> is loaded, automatically the VM will spin up and then, Ironic will do the provisioning phase:</p>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Status</th>
+<th><code>Ips</code></th>
+<th>Source</th>
+<th>Plan</th>
+<th>Profile</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>lab-installer</td>
+<td>up</td>
+<td>192.168.150.94</td>
+<td><code>CentOS-8-GenericCloud-8.2.2004-20200611.2.x86_64.qcow2</code></td>
+<td><code>ipi-bm-alb</code></td>
+<td><code>kvirt</code></td>
+</tr>
+<tr>
+<td>lab-master-0</td>
+<td>up</td>
+<td>192.168.150.20</td>
+<td></td>
+<td><code>ipi-bm-alb</code></td>
+<td><code>kvirt</code></td>
+</tr>
+<tr>
+<td>lab-master-1</td>
+<td>up</td>
+<td>192.168.150.21</td>
+<td></td>
+<td><code>ipi-bm-alb</code></td>
+<td><code>kvirt</code></td>
+</tr>
+<tr>
+<td>lab-master-2</td>
+<td>up</td>
+<td>192.168.150.22</td>
+<td></td>
+<td><code>ipi-bm-alb</code></td>
+<td><code>kvirt</code></td>
+</tr>
+<tr>
+<td>new-host1</td>
+<td>up</td>
+<td>192.168.150.12</td>
+<td></td>
+<td><code>kvirt</code></td>
+<td><code>kvirt</code></td>
+</tr>
+</tbody>
+</table>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console><span style=color:#960050;background-color:#1e0010>
+</span><span style=color:#960050;background-color:#1e0010>
+</span><span style=color:#960050;background-color:#1e0010></span>NAME           STATE                    CONSUMER             ONLINE   ERROR
+lab-bmh-1      provisioning                                  true
+lab-master-0   externally provisioned   lab-4zshh-master-0   true
+lab-master-1   externally provisioned   lab-4zshh-master-1   true
+lab-master-2   externally provisioned   lab-4zshh-master-2   true
+<span style=color:#960050;background-color:#1e0010>
+</span></code></pre></div><h3 id=approve-the-agent-now-is-not-necessary--auto-approve-is-ready>approve the agent (Now, is not necessary-> auto-approve is ready)</h3>
+<p>Inside the assisted-installer namespace</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>
+[<span style=color:#ae81ff>root@qct-d14u03 deploy-BMHost-virtual-over-AI]# oc get agent</span>
+   <span style=color:#ae81ff>NAME                                   CLUSTER       APPROVED</span>
+   <span style=color:#ae81ff>12bb3e0a-7364-41ab-8bd3-404d40b51cb4   lab-cluster   false</span>
+   <span style=color:#ae81ff>31063900-0e16-4e27-8e31</span>-<span style=color:#ae81ff>a1268ae81ce1   lab-cluster   false</span>
+   <span style=color:#ae81ff>a8239b64-84ca-4562-b116-ab9fdea7d88c   lab-cluster   false</span>
+
+[<span style=color:#ae81ff>root@qct-d14u11 ~]# oc edit agent 12bb3e0a-7364-41ab-8bd3-404d40b51cb4</span>
+
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+...
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>approved</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>clusterDeploymentName</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab</span>
+    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>role</span>: <span style=color:#e6db74>&#34;&#34;</span>
+  <span style=color:#f92672>hostname</span>: <span style=color:#ae81ff>agent3</span>
+...
+
+---
+[<span style=color:#ae81ff>root@qct-d14u11 ~]# oc get agent</span>
+<span style=color:#ae81ff>NAME                                   CLUSTER   APPROVED</span>
+   <span style=color:#ae81ff>12bb3e0a-7364-41ab-8bd3-404d40b51cb4   lab-cluster   true</span>
+   <span style=color:#ae81ff>31063900-0e16-4e27-8e31</span>-<span style=color:#ae81ff>a1268ae81ce1   lab-cluster   true</span>
+   <span style=color:#ae81ff>a8239b64-84ca-4562-b116-ab9fdea7d88c   lab-cluster   true</span>
+</code></pre></div><h2 id=installation-starting>Installation starting</h2>
+<p>From here the installation will continue installing the nodes:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>status</span>:
+<span style=color:#f92672>conditions</span>:
+- <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T13:42:41Z&#34;</span>
+<span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T13:42:41Z&#34;</span>
+<span style=color:#f92672>message</span>: <span style=color:#ae81ff>The Spec has been successfully applied</span>
+<span style=color:#f92672>reason</span>: <span style=color:#ae81ff>SyncOK</span>
+<span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>SpecSynced</span>
+- <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+<span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+<span style=color:#f92672>message</span>: <span style=color:#ae81ff>The cluster requirements are met</span>
+<span style=color:#f92672>reason</span>: <span style=color:#ae81ff>ClusterAlreadyInstalling</span>
+<span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>RequirementsMet</span>
+- <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+<span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+<span style=color:#f92672>message</span>: <span style=color:#ae81ff>The cluster&#39;s validations are passing</span>
+<span style=color:#f92672>reason</span>: <span style=color:#ae81ff>ValidationsPassing</span>
+<span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Validated</span>
+- <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:13:49Z&#34;</span>
+<span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:13:49Z&#34;</span>
+<span style=color:#f92672>message: &#39;The installation is in progress</span>: <span style=color:#ae81ff>Installation in progress&#39;</span>
+<span style=color:#f92672>reason</span>: <span style=color:#ae81ff>InstallationInProgress</span>
+<span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;False&#34;</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Completed</span>
+</code></pre></div><h2 id=installation-finished>Installation Finished</h2>
+<p>Once the installation finished:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>conditions</span>:
+  - <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T13:42:41Z&#34;</span>
+    <span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T13:42:41Z&#34;</span>
+    <span style=color:#f92672>message</span>: <span style=color:#ae81ff>The Spec has been successfully applied</span>
+    <span style=color:#f92672>reason</span>: <span style=color:#ae81ff>SyncOK</span>
+    <span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+    <span style=color:#f92672>type</span>: <span style=color:#ae81ff>SpecSynced</span>
+  - <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+    <span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+    <span style=color:#f92672>message</span>: <span style=color:#ae81ff>The cluster requirements are met</span>
+    <span style=color:#f92672>reason</span>: <span style=color:#ae81ff>ClusterAlreadyInstalling</span>
+    <span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+    <span style=color:#f92672>type</span>: <span style=color:#ae81ff>RequirementsMet</span>
+  - <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+    <span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:12:39Z&#34;</span>
+    <span style=color:#f92672>message</span>: <span style=color:#ae81ff>The cluster&#39;s validations are passing</span>
+    <span style=color:#f92672>reason</span>: <span style=color:#ae81ff>ValidationsPassing</span>
+    <span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+    <span style=color:#f92672>type</span>: <span style=color:#ae81ff>Validated</span>
+  - <span style=color:#f92672>lastProbeTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:34:32Z&#34;</span>
+    <span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-05-12T14:34:32Z&#34;</span>
+    <span style=color:#f92672>message</span>: <span style=color:#e6db74>&#34;The installation has completed: cluster is adding hosts to existing OCP cluster&#34;</span>
+    <span style=color:#f92672>reason</span>: <span style=color:#ae81ff>InstallationCompleted</span>
+    <span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+    <span style=color:#f92672>type</span>: <span style=color:#ae81ff>Completed</span>
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/ title="Virtual over ACM"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Virtual over ACM</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/ title=RemoteWorkerNode>Next - RemoteWorkerNode <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

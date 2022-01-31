@@ -1,0 +1,315 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Assisted Installer - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Assisted Installer">
+<meta property="og:description" content="Reference  Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator External Operator ref: https://github.com/openshift/assisted-service quay.io reference tag: https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags  Assisted Installer Operator Catalog Source First thing is to create the catalog source with the quay image from the Development team.
+The only thing we need to change is the tag for the image using the reference url
+--- apiVersion: operators.coreos.com/v1alpha1 kind: CatalogSource metadata: name: assisted-service namespace: openshift-marketplace spec: image: quay.io/ocpmetal/assisted-service-index:<tag from quay.io> sourceType: grpc  In case you want to go with the version of the Operator Hub, in the extra folder you&rsquo;ve got the file assisted-installer-CS-operatorHub.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Assisted Installer">
+<meta name=twitter:description content="Reference  Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator External Operator ref: https://github.com/openshift/assisted-service quay.io reference tag: https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags  Assisted Installer Operator Catalog Source First thing is to create the catalog source with the quay image from the Development team.
+The only thing we need to change is the tag for the image using the reference url
+--- apiVersion: operators.coreos.com/v1alpha1 kind: CatalogSource metadata: name: assisted-service namespace: openshift-marketplace spec: image: quay.io/ocpmetal/assisted-service-index:<tag from quay.io> sourceType: grpc  In case you want to go with the version of the Operator Hub, in the extra folder you&rsquo;ve got the file assisted-installer-CS-operatorHub.">
+<meta itemprop=name content="Assisted Installer">
+<meta itemprop=description content="Reference  Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator External Operator ref: https://github.com/openshift/assisted-service quay.io reference tag: https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags  Assisted Installer Operator Catalog Source First thing is to create the catalog source with the quay image from the Development team.
+The only thing we need to change is the tag for the image using the reference url
+--- apiVersion: operators.coreos.com/v1alpha1 kind: CatalogSource metadata: name: assisted-service namespace: openshift-marketplace spec: image: quay.io/ocpmetal/assisted-service-index:<tag from quay.io> sourceType: grpc  In case you want to go with the version of the Operator Hub, in the extra folder you&rsquo;ve got the file assisted-installer-CS-operatorHub.">
+<meta itemprop=wordCount content="713"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="assisted-installer,AI,operator,labs,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Assisted Installer</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#catalog-source>Catalog Source</a></li>
+<li><a href=#requirements-for-assisted-installer>Requirements for Assisted Installer</a>
+<ul>
+<li><a href=#ai-operator-group>AI Operator Group</a></li>
+<li><a href=#subscription-ai>Subscription AI</a></li>
+<li><a href=#using-this-config-map>Using this config map</a></li>
+<li><a href=#deploy-agent>Deploy Agent</a></li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><a href=#patch-https-in-case-of-error>Patch HTTPS in case of error</a></li>
+<li><a href=#older-operator-version>Older operator version</a></li>
+</ul>
+</nav></aside>
+<h1 id=reference>Reference</h1>
+<ul>
+<li>Deploy Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator>https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator</a></li>
+<li>External Operator ref: <a href=https://github.com/openshift/assisted-service>https://github.com/openshift/assisted-service</a></li>
+<li><code>quay.io</code> reference tag: <a href="https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags">https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags</a></li>
+</ul>
+<h1 id=assisted-installer-operator>Assisted Installer Operator</h1>
+<h2 id=catalog-source>Catalog Source</h2>
+<p>First thing is to create the catalog source with the quay image from the Development team.</p>
+<p>The only thing we need to change is the <strong>tag for the image</strong> using the <a href="https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags">reference url</a></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CatalogSource</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-service</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>openshift-marketplace</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>image</span>: <span style=color:#ae81ff>quay.io/ocpmetal/assisted-service-index:&lt;tag from quay.io&gt;</span>
+  <span style=color:#f92672>sourceType</span>: <span style=color:#ae81ff>grpc</span>
+</code></pre></div><ul>
+<li>In case you want to go with the version of the Operator Hub, in the extra folder you&rsquo;ve got the file
+<code>assisted-installer-CS-operatorHub.yml</code></li>
+<li>In the case you want to compile your own image, you could follow the steps in the extra folder script: <code>create-quay-image.sh</code></li>
+</ul>
+<h2 id=requirements-for-assisted-installer>Requirements for Assisted Installer</h2>
+<p>The idea is to create the namespace and fulfill the remaining requirements before installing the operator:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Namespace</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-installer</span>
+</code></pre></div><h3 id=ai-operator-group>AI Operator Group</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>OperatorGroup</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-installer-operator</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>targetNamespaces</span>:
+    - <span style=color:#ae81ff>assisted-installer</span>
+</code></pre></div><h3 id=subscription-ai>Subscription AI</h3>
+<p>Now it&rsquo;s time for the subscription, but there are important things to keep in mind:</p>
+<ul>
+<li>OpenShift version that you have to force deploying the 4.8</li>
+<li>Deploy_target: <code>onprem</code> if you&rsquo;re on <code>BareMetalHost</code></li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Subscription</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-service-operator</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>channel</span>: <span style=color:#ae81ff>alpha</span>
+  <span style=color:#f92672>installPlanApproval</span>: <span style=color:#ae81ff>Automatic</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-service-operator</span>
+  <span style=color:#f92672>source</span>: <span style=color:#ae81ff>assisted-service</span>
+  <span style=color:#f92672>sourceNamespace</span>: <span style=color:#ae81ff>openshift-marketplace</span>
+</code></pre></div><p>At this point, now this should be fixed, but we will keep it here, in case you have any problem with the HTTPS certificate validation using the RHCOS image, you could hack it, using a local web server to serve the RHCOS image and change the line with the image to something like this:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>- <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OPENSHIFT_VERSIONS</span>
+        <span style=color:#f92672>value</span>: <span style=color:#e6db74>&#39;{&#34;4.8&#34;:{&#34;rhcos_image&#34;:&#34;http://&lt;LOCAL-INSTALLER-WEBSEFVER_IP&gt;/rhcos-48.84.202104252100-0-live.x86_64.iso&#34;,&#34;rhcos_version&#34;: &#34;48.84.202104252100-0&#34;}}&#39;</span>
+</code></pre></div><h3 id=using-this-config-map>Using this config map</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-assisted-service-config</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>LOG_LEVEL</span>: <span style=color:#e6db74>&#34;debug&#34;</span>
+</code></pre></div><h3 id=deploy-agent>Deploy Agent</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AgentServiceConfig</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>agent</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>unsupported.agent-install.openshift.io/assisted-service-configmap</span>: <span style=color:#e6db74>&#34;my-assisted-service-config&#34;</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>databaseStorage</span>:
+    <span style=color:#f92672>accessModes</span>:
+      - <span style=color:#ae81ff>ReadWriteOnce</span>
+    <span style=color:#f92672>resources</span>:
+      <span style=color:#f92672>requests</span>:
+        <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>20Gi</span>
+  <span style=color:#f92672>filesystemStorage</span>:
+    <span style=color:#f92672>accessModes</span>:
+      - <span style=color:#ae81ff>ReadWriteOnce</span>
+    <span style=color:#f92672>resources</span>:
+      <span style=color:#f92672>requests</span>:
+        <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>20Gi</span>
+  <span style=color:#f92672>osImages</span>:
+    - <span style=color:#f92672>openshiftVersion</span>: <span style=color:#e6db74>&#34;4.8&#34;</span>
+      <span style=color:#f92672>version</span>: <span style=color:#e6db74>&#34;&#34;</span>
+      <span style=color:#f92672>url</span>: <span style=color:#e6db74>&#34;https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest-4.8/rhcos-live.x86_64.iso&#34;</span>
+      <span style=color:#f92672>rootFSUrl</span>: <span style=color:#e6db74>&#34;https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/pre-release/latest-4.8/rhcos-live-rootfs.x86_64.img&#34;</span>
+</code></pre></div><h1 id=older-release-notes-not-used-now-but-keep-as-a-document-reference-in-case-you-need-it>Older Release Notes (not used now but keep as a document reference in case you need it):</h1>
+<h2 id=patch-https-in-case-of-error>Patch HTTPS in case of error</h2>
+<div class="panel panel-notice"><div class=panel-header>
+<h3><i class="fas fa-lightbulb"></i>&nbsp;Information</h3>
+</div><div class=panel-body>
+With the new releases tag this step is not necessary but keep it just to get a workaround
+</div>
+</div>
+<p>If you have a problem with the HTTPS, there is a hack to avoid it, using the next patch:</p>
+<ol>
+<li>
+<p>For the value RHCOS image -> Get the https in local, and put it in a web server (maybe the installer <code>/var/www/html/rhcos-48.84.202104252100-0-live.x86_64.iso</code>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>value</span>: <span style=color:#e6db74>&#39;{&#34;4.8&#34;:{&#34;rhcos_image&#34;:&#34;https://&lt;ip-installer-vm&gt;/rhcos-48.84.202104252100-0-live.x86_64.iso&#34;,&#34;rhcos_version&#34;: &#34;48.84.202104252100-0&#34;}}&#39;</span>
+</code></pre></div></li>
+<li>
+<p>After that, create the deployment <code>oc apply -f 04-ai-subscription.yml</code> and wait until pods are ready</p>
+</li>
+<li>
+<p>Now, we have to scale to 0 replicas the operator</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>oc scale --replicas<span style=color:#f92672>=</span><span style=color:#ae81ff>0</span> deployment/assisted-service-operator
+</code></pre></div></li>
+<li>
+<p>Then use <code>oc edit deployment/assisted-service</code> to:</p>
+<ul>
+<li>Change <code>https</code> to <code>http</code> in the <code>base-url</code></li>
+<li>Remove <code>SERVE_HTTPS</code> to <code>false</code></li>
+<li><code>None</code> in <code>Auth-type</code> instead of <code>local</code></li>
+<li><code>HTTP</code> in <code>liveness</code> and <code>readiness</code></li>
+</ul>
+</li>
+<li>
+<p>And use <code>oc edit route/assisted-service</code> to:</p>
+<ul>
+<li>remove <code>tls</code> section (2 lines)</li>
+</ul>
+</li>
+<li>
+<p>Now you should have the operator running:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 sno-baremetal<span style=color:#f92672>]</span><span style=color:#75715e># oc get pod</span>
+NAME                                         READY   STATUS             RESTARTS   AGE
+assisted-service-f5d56977-ldds8              2/2     Running            <span style=color:#ae81ff>0</span>          4h2m
+assisted-service-operator-84cd55f754-wg56l   1/1     Running            <span style=color:#ae81ff>0</span>          4h3m
+</code></pre></div><p>and if you&rsquo;ve applied the patch just have the service:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 sno-baremetal<span style=color:#f92672>]</span><span style=color:#75715e># oc get pod</span>
+NAME                                         READY   STATUS             RESTARTS   AGE
+assisted-service-f5d56977-ldds8              2/2     Running            <span style=color:#ae81ff>0</span>          4h2m
+</code></pre></div></li>
+</ol>
+<h2 id=older-operator-version>Older operator version</h2>
+<p>Just to keep in mind if you&rsquo;re using an older version:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console>NAME                           	READY   STATUS	RESTARTS   AGE
+assisted-service-7488755f7-lgkdv   1/1 	Running   0      	18h
+ocp-metal-ui-54b96c4657-d6svz  	1/1 	Running   0      	18h
+postgres-5fcc9c9d66-2vcd5      	1/1 	Running   0      	18h
+scality-66556c48bf-5bdtp       	1/1 	Running   0      	18h
+</code></pre></div><p>Finally, expose the service <code>ocp-metal-ui</code> so the application can be accessed via web.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>oc expose svc ocp-metal-ui
+</code></pre></div><p>This will create the <code>ocp-metal-ui</code> to access the AI web console: <code>ocp-metal-ui-assisted-installer.apps.&lt;cluster-name>.&lt;domain></code></p>
+<p>You need to add (<code>/etc/hosts</code>) entries to be accessible from the external host (using port 80)</p>
+<p>When you get access to the Web User Interface:
+<code>http://ocp-metal-ui-assisted-installer.apps.qct11.karmalabs.com/clusters</code></p>
+<p>You could see an error that says that it&rsquo;s not possible to get information about clusters. It&rsquo;s a bug and to solve it:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 sno-ai-hive-baremetal<span style=color:#f92672>]</span><span style=color:#75715e># oc get svc</span>
+NAME TYPE CLUSTER-IP EXTERNAL-IP PORT<span style=color:#f92672>(</span>S<span style=color:#f92672>)</span> AGE
+assisted-service LoadBalancer 172.30.85.231 &lt;pending&gt; 8090:31932/TCP 38m
+controller-manager-metrics-service ClusterIP 172.30.227.249 &lt;none&gt; 8443/TCP 38m
+ocp-metal-ui LoadBalancer 172.30.179.237 &lt;pending&gt; 80:31732/TCP 38m
+postgres LoadBalancer 172.30.255.43 &lt;pending&gt; 5432:31168/TCP 38m
+</code></pre></div><p>You have to edit the config map for the <code>ocp-metal-ui</code> to change the proxy port reference to this bold value (31932)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>oc edit cm ocp-metal-ui
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/operator/hive/ title=Hive><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Hive</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ title="Hub & Spoke cluster">Next - Hub & Spoke cluster <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

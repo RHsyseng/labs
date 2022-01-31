@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>IPv4 on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/ipv4/</link>
+    <description>Recent content in IPv4 on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/ipv4/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>kcli with Metal³ and IPv4 connected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-metal3.yml  AUTOMATIC installation with this three parameters, the installation will be automatic from scratch to finish:
+ lab:true launch_steps: true deploy_openshift: true  Edit your lab-metal3.yml maybe you could copy from file .example in kcli plan:
+lab: true version: ci provisioning_enable: false virtual_protocol: redfish uefi_legacy: true virtual_masters: true virtual_workers: false launch_steps: true deploy_openshift: true cluster: test-ci domain: alklabs.</description>
+    </item>
+    
+    <item>
+      <title>kcli without Metal³ and IPv4 connected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-withoutMetal3.yml  Prepare the environment OCP previous installation: We&amp;rsquo;re going to deploy an IPI cluster (all versions, but for the example, we will use 4.8) using kcli to deploy ASAP.
+In this example, we&amp;rsquo;ve got two kinds of deployment:
+ SNO Multinode  The first one is the multi-node. To deploy the multi-node OCP cluster:</description>
+    </item>
+    
+    <item>
+      <title>Manual SNO on baremetal</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</guid>
+      <description>Reference Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-manual-sno-upi-baremetal
+External ref: https://github.com/eranco74/bootstrap-in-place-poc
+First of all, download the rhcos-live image curl -Lk https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-live.x86_64.iso &amp;gt; /var/lib/libvirt/images/rhcos-live.x86_64.iso Create an install config (take a look at the “samples” folder in lab-manual-sno-upi-baremetal) You need to add the SSH pub key and the pull secret to your install-config.yaml.
+# Set to 0 the number of workers compute.replicas: 0 # Set to 1 the number of masters controlPlane.replicas: 1 # Set platform to none platform.</description>
+    </item>
+    
+  </channel>
+</rss>

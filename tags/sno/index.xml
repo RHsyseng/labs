@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>sno on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/sno/</link>
+    <description>Recent content in sno on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/sno/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/</guid>
+      <description>References Lab-index branch: sno-acm-stark
+https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal
+https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+Previous Requirements  Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster. This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.  ACM Installation Using the next script to install the ACM on the Single Node Cluster:</description>
+    </item>
+    
+    <item>
+      <title>Manual SNO on baremetal</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</guid>
+      <description>Reference Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-manual-sno-upi-baremetal
+External ref: https://github.com/eranco74/bootstrap-in-place-poc
+First of all, download the rhcos-live image curl -Lk https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-live.x86_64.iso &amp;gt; /var/lib/libvirt/images/rhcos-live.x86_64.iso Create an install config (take a look at the “samples” folder in lab-manual-sno-upi-baremetal) You need to add the SSH pub key and the pull secret to your install-config.yaml.
+# Set to 0 the number of workers compute.replicas: 0 # Set to 1 the number of masters controlPlane.replicas: 1 # Set platform to none platform.</description>
+    </item>
+    
+  </channel>
+</rss>

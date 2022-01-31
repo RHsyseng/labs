@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>RWN on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/rwn/</link>
+    <description>Recent content in RWN on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/rwn/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Day2 with spoke cluster to add worker nodes</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Day2 workflow to add worker nodes 1-. Deploy hub cluster (Requirements)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirements)
+3-. Finish the spoke cluster installation (multinode 3 nodes)</description>
+    </item>
+    
+    <item>
+      <title>Day2 with spoke cluster to add worker nodes</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Day2 workflow to add worker nodes 1-. Deploy hub cluster (Requirements)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirements)
+3-. Finish the spoke cluster installation (multinode 3 nodes)</description>
+    </item>
+    
+    <item>
+      <title>Remote Worker Node in Day2 spoke cluster to add worker nodes</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Remote worker node into Day2 spoke cluster workflow 1-. Deploy hub cluster (Requirement)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirement)
+3-. Finish the spoke cluster installation (multinode 3 nodes)</description>
+    </item>
+    
+    <item>
+      <title>RWN to Assisted Installer using AICLI API</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api
+Scenario Description Once we&amp;rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful to add new remote worker nodes (maybe worker nodes using the same network)
+In this case, we&amp;rsquo;ve got 2 possibilities to do that:
+ Using the API or maybe an abstraction using AICLI Using the CRD operator (not developed yet)  Requirement We need an environment with:
+ Hub deployment ready (UPI,IPI whatever) AI operator + Hive + LocalStorage Cluster 3 multi-node (not possible to do using SNO).</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AI on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/ai/</link>
+    <description>Recent content in AI on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/ai/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Assisted Installer</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/</guid>
+      <description>Reference  Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator External Operator ref: https://github.com/openshift/assisted-service quay.io reference tag: https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags  Assisted Installer Operator Catalog Source First thing is to create the catalog source with the quay image from the Development team.
+The only thing we need to change is the tag for the image using the reference url
+--- apiVersion: operators.coreos.com/v1alpha1 kind: CatalogSource metadata: name: assisted-service namespace: openshift-marketplace spec: image: quay.io/ocpmetal/assisted-service-index:&amp;lt;tag from quay.io&amp;gt; sourceType: grpc  In case you want to go with the version of the Operator Hub, in the extra folder you&amp;rsquo;ve got the file assisted-installer-CS-operatorHub.</description>
+    </item>
+    
+    <item>
+      <title>Using Assisted Installer (AI)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-AI To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&amp;rsquo;re going to use. If you have some doubts you could use the next tool to verify it: pull secret validator</description>
+    </item>
+    
+  </channel>
+</rss>

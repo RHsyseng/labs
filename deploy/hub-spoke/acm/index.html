@@ -1,0 +1,478 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Using Advanced Cluster Management (ACM) - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Using Advanced Cluster Management (ACM)">
+<meta property="og:description" content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm
+To have a full reference there&rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&rsquo;re going to use for the deployment. If you have some doubts you could use the next tool to verify it: pull secret validator">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Using Advanced Cluster Management (ACM)">
+<meta name=twitter:description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm
+To have a full reference there&rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&rsquo;re going to use for the deployment. If you have some doubts you could use the next tool to verify it: pull secret validator">
+<meta itemprop=name content="Using Advanced Cluster Management (ACM)">
+<meta itemprop=description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm
+To have a full reference there&rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&rsquo;re going to use for the deployment. If you have some doubts you could use the next tool to verify it: pull secret validator">
+<meta itemprop=wordCount content="1051"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="ACM,labs,Spoke,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Using Advanced Cluster Management (ACM)</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#reference>Reference</a></li>
+<li><a href=#create-the-pull-secret>Create the pull-secret</a></li>
+<li><a href=#ssh-private-key>SSH private key</a></li>
+<li><a href=#clusterimageset>ClusterImageSet</a></li>
+<li><a href=#config-map-for-the-assisted-service-config>Config map for the assisted service config</a></li>
+<li><a href=#agent-service-config>Agent Service Config</a></li>
+<li><a href=#mirror-config-map-only-for-disconnected-environment>Mirror Config Map (only for disconnected environment)</a></li>
+<li><a href=#create-the-cluster-deployment-with-the-new-spec>Create the cluster deployment with the new spec</a></li>
+<li><a href=#create-new-spoke-namespace>Create new spoke namespace</a></li>
+<li><a href=#create-the-agent-cluster-install>Create the Agent Cluster Install</a></li>
+<li><a href=#create-the-rest-of-manifests-required-by-acm>Create the rest of manifests required by ACM</a></li>
+<li><a href=#create-the-infraenv>Create the <code>InfraEnv</code></a></li>
+<li><a href=#check-the-status-output>Check the status output.</a></li>
+</ul>
+</nav></aside>
+<h2 id=reference>Reference</h2>
+<p>Deploy Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm>https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm</a></p>
+<p>To have a full reference there&rsquo;s a <a href=https://github.com/RHsyseng/labs-index/blob/master/deploy-hub-spoke-over-acm/deploy.sh>deploy script</a> inside the deploy folder mentioned before, with all the steps shown here.</p>
+<h2 id=create-the-pull-secret>Create the pull-secret</h2>
+<p>This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&rsquo;re going to use for the deployment.
+If you have some doubts you could use the next tool to verify it:
+<a href=http://pullsecret-validator-pullsecret-validator.apps.shift.cloud.lab.eng.bos.redhat.com/>pull secret validator</a></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+<span style=color:#f92672>stringData</span>:
+  <span style=color:#f92672>.dockerconfigjson</span>: <span style=color:#e6db74>&#34;PULL_SECRET&#34;</span>
+  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>kubernetes.io/dockerconfigjson</span>
+</code></pre></div><h2 id=ssh-private-key>SSH private key</h2>
+<p>This SSH key will be used for the user <code>core</code>, the one we will be able to use to <code>ssh</code> into our CoreOS-deployed systems.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>creationTimestamp</span>: <span style=color:#66d9ef>null</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-ssh-private-key</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Opaque</span>
+<span style=color:#f92672>stringData</span>: --<span style=color:#ae81ff>redacted--</span>
+</code></pre></div><h2 id=clusterimageset>ClusterImageSet</h2>
+<p>This is the reference we&rsquo;ve used in the AI cluster deployment. So, you have to use the same name, and also replace the tag with the OCP release you&rsquo;re using. If you want to query available image release look at this <a href=https://openshift-release.apps.ci.l2s4.p1.openshiftapps.com/releasestream/4-stable/release/4.8.0>here</a></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>hive.openshift.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterImageSet</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>openshift-v4.8.0</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>releaseImage</span>: <span style=color:#ae81ff>TAG_OCP_IMAGE_RELEASE</span>
+</code></pre></div><h2 id=config-map-for-the-assisted-service-config>Config map for the assisted service config</h2>
+<p>This is the way to pass some configuration to the assisted service. In our case just log level set to debug</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-service-config</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>assisted-service</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>LOG_LEVEL</span>: <span style=color:#e6db74>&#34;debug&#34;</span>
+</code></pre></div><h2 id=agent-service-config>Agent Service Config</h2>
+<p>This file should contain the <code>osImages</code> which will be used.</p>
+<div class="panel panel-warning"><div class=panel-header>
+<h3><i class="fas fa-exclamation-triangle"></i>&nbsp;Important</h3>
+</div><div class=panel-body>
+Here if you&rsquo;re using a Connected environment could be directly the mirror. But, If you&rsquo;re using a disconnected environment, you need to download to the httpd server in order to be available:
+</div>
+</div>
+<div class="panel panel-notice"><div class=panel-header>
+<h3><i class="fas fa-info-circle"></i>&nbsp;Disconnected</h3>
+</div><div class=panel-body>
+if you&rsquo;re deploying with a lab kcli IPI plan bare-metal of this repository, in the script <code>05_cache.sh</code> is there a section to download these images to the httpd server in the installer node.
+</div>
+</div>
+<p>Example YAML file:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AgentServiceConfig</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>agent</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>unsupported.agent-install.openshift.io/assisted-service-configmap</span>: <span style=color:#e6db74>&#34;assisted-service-config&#34;</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>databaseStorage</span>:
+    <span style=color:#f92672>accessModes</span>:
+      - <span style=color:#ae81ff>ReadWriteOnce</span>
+    <span style=color:#f92672>resources</span>:
+      <span style=color:#f92672>requests</span>:
+        <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>40Gi</span>
+  <span style=color:#f92672>filesystemStorage</span>:
+    <span style=color:#f92672>accessModes</span>:
+      - <span style=color:#ae81ff>ReadWriteOnce</span>
+    <span style=color:#f92672>resources</span>:
+      <span style=color:#f92672>requests</span>:
+        <span style=color:#f92672>storage</span>: <span style=color:#ae81ff>40Gi</span>
+  <span style=color:#f92672>mirrorRegistryRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#e6db74>&#34;lab-index-mirror&#34;</span>
+  <span style=color:#f92672>osImages</span>:
+    - <span style=color:#f92672>openshiftVersion</span>: <span style=color:#e6db74>&#34;4.8&#34;</span>
+      <span style=color:#f92672>version</span>: <span style=color:#e6db74>&#34;&#34;</span>
+      <span style=color:#f92672>url</span>: <span style=color:#e6db74>&#34;http://INSTALLER_IP/rhcos-live.x86_64.iso&#34;</span>
+      <span style=color:#f92672>rootFSUrl</span>: <span style=color:#e6db74>&#34;http://INSTALLER_IP/rhcos-live-rootfs.x86_64.img&#34;</span>
+</code></pre></div><h2 id=mirror-config-map-only-for-disconnected-environment>Mirror Config Map (only for disconnected environment)</h2>
+<p>This is a step required for the disconnected environment to get the information about the CA certificate, the bundle and the <code>registries.conf</code> info:</p>
+<ul>
+<li>CA certificate:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>cabundle<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>ssh -q root@$ip -x <span style=color:#e6db74>&#39;cat /opt/registry/certs/domain.crt&#39;</span><span style=color:#66d9ef>)</span>
+echo -e <span style=color:#e6db74>&#34;  ca-bundle.crt: |\n</span><span style=color:#66d9ef>$(</span>echo -n <span style=color:#e6db74>&#34;</span>$cabundle<span style=color:#e6db74>&#34;</span>  | sed <span style=color:#e6db74>&#34;s/^/    /&#34;</span><span style=color:#66d9ef>)</span><span style=color:#e6db74>&#34;</span> &gt;&gt; 05_Mirror_ConfigMap.yml
+</code></pre></div><p>where the $ip is the variable for the installer helper node but depending of ipv4 or ipv6 will be a different formatted ip.</p>
+<ul>
+<li>The <code>registries.conf</code> information</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>reg<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>ssh -q core@$ip0 -x <span style=color:#e6db74>&#39;cat /etc/containers/registries.conf&#39;</span><span style=color:#66d9ef>)</span>
+echo -e <span style=color:#e6db74>&#34;  registries.conf: |\n</span><span style=color:#66d9ef>$(</span>echo -n <span style=color:#e6db74>&#34;</span>$reg<span style=color:#e6db74>&#34;</span>  | sed <span style=color:#e6db74>&#34;s/^/    /&#34;</span><span style=color:#66d9ef>)</span><span style=color:#e6db74>&#34;</span> &gt;&gt; 05_Mirror_ConfigMap.yml
+</code></pre></div><p>where the $ip is the variable for the installer helper node but depending of ipv4 or ipv6 will be a different formatted ip.</p>
+<p>After this composition, the result file looks like:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ConfigMap</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-index-mirror</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>app</span>: <span style=color:#ae81ff>assisted-service</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>ca-bundle.crt</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>    -----BEGIN CERTIFICATE-----
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    -----END CERTIFICATE-----</span>    
+  <span style=color:#f92672>registries.conf</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>    unqualified-search-registries = [&#34;registry.access.redhat.com&#34;, &#34;docker.io&#34;]
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;quay.io/acm-d&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/rhacm2&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;quay.io/openshift-release-dev/ocp-v4.0-art-dev&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/ocp4&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;quay.io:443/acm-d&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/rhacm2&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.ci.openshift.org/ocp/release&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/ocp4&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.redhat.io/ocp4&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/ocp4&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.redhat.io/openshift4&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/openshift4&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.redhat.io/rhacm2&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/rhacm2&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.redhat.io/rhacm2/managedcluster-import-controller-rhel8&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/rhacm2/managedcluster-import-controller-rhel8&#34;
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.redhat.io/rhel8&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/rhel8&#34;
+</span><span style=color:#e6db74>    [[registry]]
+</span><span style=color:#e6db74>      prefix = &#34;&#34;
+</span><span style=color:#e6db74>      location = &#34;registry.ci.openshift.org/ocp4/release&#34;
+</span><span style=color:#e6db74>      mirror-by-digest-only = false
+</span><span style=color:#e6db74>
+</span><span style=color:#e6db74>      [[registry.mirror]]
+</span><span style=color:#e6db74>        location = &#34;lab-ipv6-installer.labipv6-net:5000/ocp4&#34;</span>    
+</code></pre></div><h2 id=create-the-cluster-deployment-with-the-new-spec>Create the cluster deployment with the new spec</h2>
+<p>The important thing here is the &ldquo;cluster installer reference&rdquo; just to point to the new configuration &ldquo;agent Cluster Install&rdquo; which will be defined in the next step. Also, remember that all the reference will be the new spoke name or namespace.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>hive.openshift.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ClusterDeployment</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>baseDomain</span>: <span style=color:#ae81ff>alklabs.com</span>
+  <span style=color:#f92672>clusterInstallRef</span>:
+    <span style=color:#f92672>group</span>: <span style=color:#ae81ff>extensions.hive.openshift.io</span>
+    <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AgentClusterInstall</span>
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+    <span style=color:#f92672>version</span>: <span style=color:#ae81ff>v1beta1</span>
+  <span style=color:#f92672>clusterName</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>controlPlaneConfig</span>:
+    <span style=color:#f92672>servingCertificates</span>: {}
+  <span style=color:#f92672>platform</span>:
+    <span style=color:#f92672>agentBareMetal</span>:
+      <span style=color:#f92672>agentSelector</span>:
+        <span style=color:#f92672>matchLabels</span>:
+          <span style=color:#f92672>cluster-name</span>: <span style=color:#e6db74>&#34;OC_SPOKE_NAME&#34;</span>
+  <span style=color:#f92672>pullSecretRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+</code></pre></div><h2 id=create-new-spoke-namespace>Create new spoke namespace</h2>
+<p>The spoke will be deployed in a new namespace, you have to create it before continuing with the rest of manifests:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>oc create project &lt;OC_SPOKE_NAME&gt;
+</code></pre></div><h2 id=create-the-agent-cluster-install>Create the Agent Cluster Install</h2>
+<p>Note:</p>
+<ul>
+<li>the <code>controlPlaneAgents</code> will be <strong><code>1/3</code></strong>, and <code>workerAgents</code> will be <strong><code>xxx</code></strong>.</li>
+<li>the <code>sshPublicKey</code> needs to be modified to include the public key pair.</li>
+</ul>
+<p>So here we have two possibilities:</p>
+<ul>
+<li>SNO: you have to set "" the <code>api-vip</code> and <code>ingress-vip</code>, but also you have to keep the <code>machineNetwork</code></li>
+<li>Multi-node: you have to set properly the <code>api-vip</code> and the <code>ingress-vip</code>, but you could omit the <code>machineNetwork</code> because it is auto-discovered from the two IPs</li>
+</ul>
+<p>Another consideration is the <code>imageSetRef</code> which should be the same you created before as well as the <code>clusterDeployment</code> reference. Remember the name for the spoke</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions.hive.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AgentClusterInstall</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>apiVIP</span>: <span style=color:#ae81ff>2620</span>:<span style=color:#ae81ff>52</span>:<span style=color:#ae81ff>0</span>:<span style=color:#ae81ff>1304</span>::<span style=color:#ae81ff>43</span>
+  <span style=color:#f92672>ingressVIP</span>: <span style=color:#ae81ff>2620</span>:<span style=color:#ae81ff>52</span>:<span style=color:#ae81ff>0</span>:<span style=color:#ae81ff>1304</span>::<span style=color:#ae81ff>42</span>
+  <span style=color:#f92672>clusterDeploymentRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>imageSetRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>openshift-v4.8.0</span>
+  <span style=color:#f92672>networking</span>:
+    <span style=color:#f92672>clusterNetwork</span>:
+      - <span style=color:#f92672>cidr</span>: <span style=color:#e6db74>&#34;fd01::/48&#34;</span>
+        <span style=color:#f92672>hostPrefix</span>: <span style=color:#ae81ff>64</span>
+    <span style=color:#f92672>serviceNetwork</span>:
+      - <span style=color:#e6db74>&#34;fd02::/112&#34;</span>
+    <span style=color:#f92672>machineNetwork</span>:
+      - <span style=color:#f92672>cidr</span>: <span style=color:#e6db74>&#34;2620:52:0:1304::/64&#34;</span>
+  <span style=color:#f92672>provisionRequirements</span>:
+    <span style=color:#f92672>controlPlaneAgents</span>: <span style=color:#ae81ff>NUMBER_OF_MASTERS</span>
+  <span style=color:#f92672>sshPublicKey</span>: <span style=color:#ae81ff>PUB_SSH_KEY</span>
+</code></pre></div><h2 id=create-the-rest-of-manifests-required-by-acm>Create the rest of manifests required by ACM</h2>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent.open-cluster-management.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>KlusterletAddonConfig</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>clusterName</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>clusterNamespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>clusterLabels</span>:
+    <span style=color:#f92672>cloud</span>: <span style=color:#ae81ff>auto-detect</span>
+    <span style=color:#f92672>vendor</span>: <span style=color:#ae81ff>auto-detect</span>
+  <span style=color:#f92672>workManager</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>applicationManager</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>false</span>
+  <span style=color:#f92672>certPolicyController</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>false</span>
+  <span style=color:#f92672>iamPolicyController</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>false</span>
+  <span style=color:#f92672>policyController</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>false</span>
+  <span style=color:#f92672>searchCollector</span>:
+    <span style=color:#f92672>enabled</span>: <span style=color:#66d9ef>false</span>
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>cluster.open-cluster-management.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ManagedCluster</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>hubAcceptsClient</span>: <span style=color:#66d9ef>true</span>
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+<span style=color:#f92672>stringData</span>:
+  <span style=color:#f92672>.dockerconfigjson</span>: <span style=color:#e6db74>&#34;PULL_SECRET&#34;</span>
+  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>kubernetes.io/dockerconfigjson</span>
+</code></pre></div><h2 id=create-the-infraenv>Create the <code>InfraEnv</code></h2>
+<ul>
+<li>the <code>sshPublicKey</code> needs to be modified to include the public key pair.</li>
+<li>the <code>sshAuthorizedKey</code> should be singular (not array)</li>
+<li><code>IgnitionConfigOverride</code> should be present</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>InfraEnv</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>clusterRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>OC_SPOKE_NAME</span>
+  <span style=color:#f92672>sshAuthorizedKey</span>: <span style=color:#ae81ff>PUB_SSH_KEY</span>
+  <span style=color:#f92672>agentLabelSelector</span>:
+    <span style=color:#f92672>matchLabels</span>:
+      <span style=color:#f92672>cluster-name</span>: <span style=color:#e6db74>&#34;OC_SPOKE_NAME&#34;</span>
+  <span style=color:#f92672>pullSecretRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+  <span style=color:#f92672>ignitionConfigOverride</span>: <span style=color:#e6db74>&#34;&#34;</span>
+</code></pre></div><h2 id=check-the-status-output>Check the status output.</h2>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-json data-lang=json>{
+<span style=color:#f92672>&#34;conditions&#34;</span>: [
+{
+<span style=color:#f92672>&#34;lastHeartbeatTime&#34;</span>: <span style=color:#e6db74>&#34;2021-03-10T09:43:53Z&#34;</span>,
+<span style=color:#f92672>&#34;lastTransitionTime&#34;</span>: <span style=color:#e6db74>&#34;2021-03-09T15:19:56Z&#34;</span>,
+<span style=color:#f92672>&#34;message&#34;</span>: <span style=color:#e6db74>&#34;Image has been created&#34;</span>,
+<span style=color:#f92672>&#34;reason&#34;</span>: <span style=color:#e6db74>&#34;ImageCreated&#34;</span>,
+<span style=color:#f92672>&#34;status&#34;</span>: <span style=color:#e6db74>&#34;True&#34;</span>,
+<span style=color:#f92672>&#34;type&#34;</span>: <span style=color:#e6db74>&#34;ImageCreated&#34;</span>
+}
+],
+<span style=color:#f92672>&#34;isoDownloadURL&#34;</span>: <span style=color:#e6db74>&#34;http://assisted-service-assisted-installer.apps.&lt;cluster-name&gt;.&lt;domain&gt;/api/assisted-install/v1/clusters/16025ed1-7bea-4b10-98c3-784e29073b9e/downloads/image&#34;</span>
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ title="Hub & Spoke cluster"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Hub & Spoke cluster</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/ title="Using Assisted Installer (AI)">Next - Using Assisted Installer (AI) <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

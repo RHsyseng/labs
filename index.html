@@ -1,0 +1,220 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Labs index - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Labs index">
+<meta property="og:description" content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Labs index">
+<meta name=twitter:description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta itemprop=name content="Labs index">
+<meta itemprop=description content="Labs to play with Edge and Telco 5G sustaining technologies"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h2 id=disclaimer>Disclaimer</h2>
+<div class="panel panel-danger"><div class=panel-header>
+<h3><i class="fas fa-exclamation-triangle"></i>&nbsp;UNSUPPORTED</h3>
+</div><div class=panel-body>
+This repository and its contents are completely UNSUPPORTED in any way and are not part of official documentation.
+</div>
+</div>
+<div class="panel panel-notice"><div class=panel-header>
+<h3><i class="fas fa-information"></i>&nbsp;Contribute!</h3>
+</div><div class=panel-body>
+<p>The documents hosted here are just personal notes, if you feel that you can contribute into polishing them as guides, feel free to let us know via issues to this repository:</p>
+<p><a href=https://gihub.com/RHsyseng/labs>https://gihub.com/RHsyseng/labs</a></p>
+</div>
+</div>
+<h2 id=description>Description</h2>
+<p>The idea of this repository is to offer everything necessary to automate the deployment processes of OpenShift laboratories and operators, as well as to document those deployments.</p>
+<p>The main advantages are:</p>
+<ul>
+<li>Documentation organized and versioned that serves as a ramp-up for new teammates.</li>
+<li>Automation of repetitive tasks such as deploying basic operators necessary for all tasks we have to do.</li>
+<li>Avoid wasting time deploying the same OpenShift environment over and over again. You can prepare the environment the night before to start working next day with a clean and ready environment.</li>
+<li>These deployments use &ldquo;runners&rdquo; (small software agents installed on the lab hosts) which will execute the workflow steps directly on the lab hosts.
+Runners can be added simply by installing an agent. The host must be installed with OS in order to be used as a runner. Moreover, <code>libvirtd</code> should be installed for most of the labs in order to create VM on the host.</li>
+</ul>
+<h2 id=repository-structure>Repository Structure</h2>
+<p>Basically, there are four kinds of folders and things here:</p>
+<p><img src=img/description-intro1.png alt=img/description-intro1.png></p>
+<p><img src=img/struct1.png alt=img/struct1.png>
+<img src=img/struct2.png alt=img/struct2.png></p>
+<h2 id=how-does-the-workflows-work>How does the workflows work</h2>
+<p><img src=img/function.png alt=img/function.png></p>
+<h2 id=install-the-action_runner-in-your-target-host>Install the <code>action_runner</code> in your target host</h2>
+<p>The agent has a pulling architecture, so you don&rsquo;t need anything about VPN or whatever</p>
+<p>Follow these <a href=https://docs.github.com/en/actions/hosting-your-own-runners/adding-self-hosted-runners><code>instructions</code></a></p>
+<p>The idea is to configure a <strong>tag</strong> during the action runner with your name (for instance <code>amorgant</code>) to use after in our workflow as a host to run it.
+To do that in the YML workflow file you must specify the tag that you created during the runner installation</p>
+<p>An example to automate just changing some parameters:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>RUNNER_ALLOW_RUNASROOT<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;1&#34;</span> ./config.sh --url &lt;repo_url&gt; --token &lt;PAT&gt; --agent &lt;runner_name&gt; --work /root/actions-runner/_work/ --runas service
+</code></pre></div><p>Remember that you need <code>libvirtd</code> and git installed to be ready for receiving jobs in your new runner.</p>
+<p>After the installation, you should be available your host to run workflows (Remember to configure with a tag to identify it):</p>
+<p><img src=img/runner.png alt=img/runner.png></p>
+<h2 id=launch-an-existing-workflow-in-your-new-runner>Launch an existing workflow in your new Runner</h2>
+<p>Once you have a runner available, you could use an existing workflow to be used in order to deploy a pipeline on this host:</p>
+<p><img src=img/workflow1.png alt=img/workflow1.png></p>
+<p>You could identify the workflows to be used because all of them must follow the next naming convention:</p>
+<ul>
+<li><code>amorgant-ocpIPI-IPv6Discon-LS-ACM.yml</code> -> <code>&lt;userIDCreated>-&lt;ocpType>-&lt;ListOfDeploys>.yml</code></li>
+</ul>
+<p><img src=img/workflow2.png alt=img/workflow2.png></p>
+<p>Now you could fill in the fields with your needs. Also, the steps could be launched in as a separate piece of the stack (without any previous requirements). For instance, you could have your own OCP already deployed from another way, and with this workflow you can only deploy AI operator.
+The last parameter is the runner where you will deploy the steps you need, so you have to use the Tag selected before during the runner creation phase.</p>
+<p><img src=img/workflow3.png alt=img/workflow3.png></p>
+<h2 id=contribute>Contribute</h2>
+<p>There are three ways where you could contribute to this repository:</p>
+<ul>
+<li>Creating new <strong>Labs/</strong> using different ways to deploy all kind of OCP deployments. Most of the current labs have been prepared to be used with kcli in the workflow, but also, you could use directly the scripts inside of each lab folders to create more complex workflows (depending on the use case requirements).</li>
+<li>Creating new <strong>deploy/</strong> using different operators or different manifests, script and so on.</li>
+<li>Creating your own <strong>workflow file</strong> to create pipelines adapted to your needs (using labs and deploy scenarios as you want).</li>
+</ul>
+<h3 id=1--clone-the-repository>1-. Clone the repository</h3>
+<pre tabindex=0><code class=language-commandline data-lang=commandline>git clone git@github.com:RHsyseng/labs-index.git
+</code></pre><h3 id=2--create-your-own-branch>2-. Create your own branch</h3>
+<p>The idea is to have some scenarios, labs, and configuration files for these scenarios, so if there are many people changing files in master could be difficult to manage.</p>
+<p>So the workflow should be:</p>
+<ul>
+<li>Create your own branch from master</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>git checkout -b &lt;my_user&gt;
+</code></pre></div><h3 id=3--change-the-scenarios-as-you-want>3-. Change the scenarios as you want&mldr;</h3>
+<ul>
+<li>If you have something to be useful for everybody (like a new scenario, lab or feature) create the PR with the changes.</li>
+<li>After the PR will be approved, the rest of people could pull their master local if the need this change and move on to their personal branch if they need it.</li>
+</ul>
+<nav class=pagination><a class="nav nav-next" href=https://pages.sysdeseng.com/labs/ocp/ title="Labs to install an OpenShift cluster">Next - Labs to install an OpenShift cluster <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><div class=edit-meta>
+<br></div><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li class=active><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

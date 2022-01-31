@@ -1,0 +1,419 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>RWN to Assisted Installer using AICLI API - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="RWN to Assisted Installer using AICLI API">
+<meta property="og:description" content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api
+Scenario Description Once we&rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful to add new remote worker nodes (maybe worker nodes using the same network)
+In this case, we&rsquo;ve got 2 possibilities to do that:
+ Using the API or maybe an abstraction using AICLI Using the CRD operator (not developed yet)  Requirement We need an environment with:
+ Hub deployment ready (UPI,IPI whatever) AI operator + Hive + LocalStorage Cluster 3 multi-node (not possible to do using SNO).">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="RWN to Assisted Installer using AICLI API">
+<meta name=twitter:description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api
+Scenario Description Once we&rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful to add new remote worker nodes (maybe worker nodes using the same network)
+In this case, we&rsquo;ve got 2 possibilities to do that:
+ Using the API or maybe an abstraction using AICLI Using the CRD operator (not developed yet)  Requirement We need an environment with:
+ Hub deployment ready (UPI,IPI whatever) AI operator + Hive + LocalStorage Cluster 3 multi-node (not possible to do using SNO).">
+<meta itemprop=name content="RWN to Assisted Installer using AICLI API">
+<meta itemprop=description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api
+Scenario Description Once we&rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful to add new remote worker nodes (maybe worker nodes using the same network)
+In this case, we&rsquo;ve got 2 possibilities to do that:
+ Using the API or maybe an abstraction using AICLI Using the CRD operator (not developed yet)  Requirement We need an environment with:
+ Hub deployment ready (UPI,IPI whatever) AI operator + Hive + LocalStorage Cluster 3 multi-node (not possible to do using SNO).">
+<meta itemprop=wordCount content="1205"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="RWN,Assisted Installer,AICLI,labs,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>RWN to Assisted Installer using AICLI API</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#reference>Reference</a></li>
+<li><a href=#scenario-description>Scenario Description</a></li>
+<li><a href=#requirement>Requirement</a></li>
+<li><a href=#create-new-cluster--day2-using-apilibrary>Create new cluster *-day2 using API/library:</a>
+<ul>
+<li><a href=#using-aicli>Using AICLI:</a></li>
+<li><a href=#using-api>Using API:</a></li>
+</ul>
+</li>
+<li><a href=#create-the-download-iso-image>Create the Download ISO Image:</a>
+<ul>
+<li><a href=#using-aicli-1>Using AICLI</a></li>
+<li><a href=#using-api-1>Using API:</a></li>
+</ul>
+</li>
+<li><a href=#create-remote-worker-vm>Create Remote Worker VM</a></li>
+<li><a href=#get-host-info>Get host info</a>
+<ul>
+<li><a href=#using-aicli-2>Using AICLI:</a></li>
+<li><a href=#using-api-2>Using API</a></li>
+</ul>
+</li>
+<li><a href=#update-some-node-attributes>Update some node attributes:</a>
+<ul>
+<li><a href=#using-aicli-3>Using AICLI:</a></li>
+</ul>
+</li>
+<li><a href=#troubleshooting>TROUBLESHOOTING</a>
+<ul>
+<li><a href=#verify-support-l2-environment>Verify SUPPORT L2 environment:</a></li>
+</ul>
+</li>
+</ul>
+</nav></aside>
+<h2 id=reference>Reference</h2>
+<p>Deploy Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api>https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api</a></p>
+<h2 id=scenario-description>Scenario Description</h2>
+<p>Once we&rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful
+to add new remote worker nodes (maybe worker nodes using the same network)</p>
+<p>In this case, we&rsquo;ve got 2 possibilities to do that:</p>
+<ul>
+<li>Using the API or maybe an abstraction using AICLI</li>
+<li>Using the CRD operator (not developed yet)</li>
+</ul>
+<h2 id=requirement>Requirement</h2>
+<p>We need an environment with:</p>
+<ul>
+<li>Hub deployment ready (UPI,IPI whatever)</li>
+<li>AI operator + Hive + LocalStorage</li>
+<li>Cluster 3 multi-node (not possible to do using SNO). The word single node is just to have one node without any possibility to add workers</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 rwn-ai-crd<span style=color:#f92672>]</span><span style=color:#75715e># oc get agents</span>
+NAME                                   CLUSTER           APPROVED
+2e37b5e4-2295-43a2-a1a1-3383271fb013   cluster-crd-rwn   true
+50ced8d3-d1d3-43ad-8dcc-df0239217707   cluster-crd-rwn   true
+ae12effa-47b9-433e-9b0e-20041092aa9d   cluster-crd-rwn   true
+</code></pre></div><p><img src=https://i.ibb.co/kQJ7HRB/image.png alt=https://i.ibb.co/kQJ7HRB/image.png></p>
+<p>Now, we&rsquo;re going to deploy a remote worker node but in a different network L3 segment: <strong>assisted-net -> 192.168.7.0/24</strong></p>
+<h2 id=create-new-cluster--day2-using-apilibrary>Create new cluster *-day2 using API/library:</h2>
+<p>The idea is to create a new cluster adding a suffix “-day2” in order to add the remote worker node to this cluster. The idea is basically join or create a trick to associate the new cluster -day2 to the original to add new hosts but not directly using the original cluster.
+So the steps should be:</p>
+<ul>
+<li>Create a new cluster -day2</li>
+<li>Create the discovery ISO associated to this new cluster -day2</li>
+<li>Spin up a new VM (remote worker) using a different L3 network (assisted-net) booting from this Discovery-day2 image</li>
+<li>Change the information required (<code>hostname</code>, <code>api_vip</code>, and so on)</li>
+<li>FIX the <strong>L2 Support</strong> Environment changing the config map</li>
+</ul>
+<h3 id=using-aicli>Using AICLI:</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>export AI_URL<span style=color:#f92672>=</span>http://&lt;url-api&gt;:&lt;port&gt;
+aicli create cluster cluster-rwn-alb2-day2
+</code></pre></div><p>To verify day2 you could do the next command to view &ldquo;adding-host&rdquo; state:</p>
+<pre tabindex=0><code>[root@qct-d14u11 ~]# aicli list cluster
++-----------------------+--------------------------------------+--------------+---------------------+
+|        Cluster        |                  Id                  |    Status    |      Dns Domain     |
++-----------------------+--------------------------------------+--------------+---------------------+
+|    cluster-rwn-alb2   | 16af2fbc-5f8a-4a37-886c-61dcaa1a66da |  installed   | qct11.karmalabs.com |
+| cluster-rwn-alb2-day2 | fcf9d761-21dc-4c92-901f-587940541ed8 | adding-hosts |         N/A         |
+
+</code></pre><p>Modify the cluster parameters using <code>02-param-update-cluster.yml</code></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>api_vip</span>: <span style=color:#ae81ff>192.168.122.183</span>
+<span style=color:#f92672>base_dns_domain</span>: <span style=color:#ae81ff>qct11.karmalabs.com</span>
+<span style=color:#f92672>cluster_network_cidr</span>: <span style=color:#ae81ff>10.128.0.0</span><span style=color:#ae81ff>/14</span>
+<span style=color:#f92672>cluster_network_host_prefix</span>: <span style=color:#ae81ff>23</span>
+<span style=color:#f92672>ingress_vip</span>: <span style=color:#ae81ff>192.168.122.166</span>
+<span style=color:#f92672>machine_network_cidr</span>: <span style=color:#ae81ff>192.168.122.0</span><span style=color:#ae81ff>/24</span>
+<span style=color:#f92672>service_network_cidr</span>: <span style=color:#ae81ff>172.30.0.0</span><span style=color:#ae81ff>/16</span>
+<span style=color:#f92672>ssh_public_key</span>: <span style=color:#ae81ff>ssh-rsa ---redacted---</span>
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># aicli update cluster cluster-rwn-alb2-day2 -P param.yml</span>
+</code></pre></div><h3 id=using-api>Using API:</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>curl --location --request POST <span style=color:#e6db74>&#39;http://ocp-metal-ui-assisted-installer.apps.qct11.karmalabs.com/api/assisted-install/v1/clusters&#39;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--header <span style=color:#e6db74>&#39;Content-Type: application/json&#39;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--header <span style=color:#e6db74>&#39;Cookie: 260e92820608233e3424b1be264be288=00c384bbdfbaabf9eb3ffd138cc6c27c&#39;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--data-raw <span style=color:#e6db74>&#39;{
+</span><span style=color:#e6db74> &#34;name&#34;: &#34;cluster-rwn-alb2-day2&#34;,
+</span><span style=color:#e6db74> &#34;high_availability_mode&#34;: &#34;Full&#34;,
+</span><span style=color:#e6db74> &#34;openshift_version&#34;: &#34;4.8&#34;,
+</span><span style=color:#e6db74> &#34;base_dns_domain&#34;: &#34;qct11.karmalabs.com&#34;,
+</span><span style=color:#e6db74> &#34;cluster_network_cidr&#34;: &#34;10.128.0.0/14&#34;,
+</span><span style=color:#e6db74> &#34;cluster_network_host_prefix&#34;: 23,
+</span><span style=color:#e6db74> &#34;service_network_cidr&#34;: &#34;172.30.0.0/16&#34;,
+</span><span style=color:#e6db74> &#34;ingress_vip&#34;: &#34;192.168.122.166&#34;,
+</span><span style=color:#e6db74> &#34;pull_secret&#34;: &#34;--- redacted ---&#34;,
+</span><span style=color:#e6db74> &#34;ssh_public_key&#34;: &#34;ssh-rsa ---redacted---&#34;
+</span><span style=color:#e6db74>}
+</span><span style=color:#e6db74>&#39;</span>
+</code></pre></div><h2 id=create-the-download-iso-image>Create the Download ISO Image:</h2>
+<h3 id=using-aicli-1>Using AICLI</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 assisted-installer-cli<span style=color:#f92672>]</span> <span style=color:#75715e># aicli create iso myclu</span>
+<span style=color:#f92672>[</span>root@qct-d14u11 assisted-installer-cli<span style=color:#f92672>]</span> <span style=color:#75715e># aicli download iso myclu</span>
+</code></pre></div><h3 id=using-api-1>Using API:</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>
+curl --location --request POST <span style=color:#e6db74>&#39;http://ocp-metal-ui-assisted-installer.apps.qct11.karmalabs.com/api/assisted-install/v1/clusters/e4e34877-1883-4b65-a404-c9228c7c7d77/downloads/image&#39;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--header <span style=color:#e6db74>&#39;Content-Type: application/json&#39;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--header <span style=color:#e6db74>&#39;Cookie: 260e92820608233e3424b1be264be288=00c384bbdfbaabf9eb3ffd138cc6c27c&#39;</span> <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>--data-raw <span style=color:#e6db74>&#39;{
+</span><span style=color:#e6db74> &#34;ssh_public_key&#34;: &#34;ssh-rsa ---redacted---&#34;,
+</span><span style=color:#e6db74> &#34;image_type&#34;: &#34;full-iso&#34;
+</span><span style=color:#e6db74>}&#39;</span>
+
+</code></pre></div><p>The response will have the URL to download the image:</p>
+<pre tabindex=0><code>{
+   &quot;base_dns_domain&quot;: &quot;qct11.karmalabs.com&quot;,
+   &quot;cluster_network_cidr&quot;: &quot;10.128.0.0/14&quot;,
+   &quot;cluster_network_host_prefix&quot;: 23,
+   &quot;connectivity_majority_groups&quot;: &quot;{}&quot;,
+   &quot;controller_logs_collected_at&quot;: &quot;0001-01-01T00:00:00.000Z&quot;,
+   &quot;controller_logs_started_at&quot;: &quot;0001-01-01T00:00:00.000Z&quot;,
+   &quot;created_at&quot;: &quot;2021-04-05T14:00:32.344Z&quot;,
+   &quot;email_domain&quot;: &quot;Unknown&quot;,
+   &quot;high_availability_mode&quot;: &quot;Full&quot;,
+   &quot;host_networks&quot;: [],
+   &quot;hosts&quot;: [],
+   &quot;href&quot;: &quot;/api/assisted-install/v1/clusters/e4e34877-1883-4b65-a404-c9228c7c7d77&quot;,
+   &quot;id&quot;: &quot;e4e34877-1883-4b65-a404-c9228c7c7d77&quot;,
+   &quot;image_info&quot;: {
+       &quot;created_at&quot;: &quot;2021-04-05T14:22:38.672Z&quot;,
+       &quot;download_url&quot;: &quot;http://assisted-service-assisted-installer.apps.qct11.karmalabs.com/api/assisted-install/v1/clusters/e4e34877-1883-4b65-a404-c9228c7c7d77/downloads/image&quot;,
+       &quot;expires_at&quot;: &quot;2021-04-05T18:22:38.672Z&quot;,
+       &quot;size_bytes&quot;: 954204160,
+       &quot;ssh_public_key&quot;: &quot;ssh-rsa ---redacted---&quot;,
+       &quot;type&quot;: &quot;full-iso&quot;
+   },
+   …
+…
+
+</code></pre><h2 id=create-remote-worker-vm>Create Remote Worker VM</h2>
+<p>The most important thing here is that you have two possibilities:</p>
+<ul>
+<li>Create a VM in the same network (Local worker)</li>
+<li>Create a VM in another network (remote worker)</li>
+</ul>
+<p>In our case we&rsquo;re gonna use the remote worker node so, we&rsquo;re gonna create the VM in another L3 network:</p>
+<p>assisted network.</p>
+<p>In this scenario:</p>
+<ul>
+<li>Default network: 192.168.122.0/24</li>
+<li>Assisted network: 192.168.7.0/24</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 assisted-installer-cli<span style=color:#f92672>]</span><span style=color:#75715e># kcli create vm -P iso=new-discovery-rwn.iso -P memory=10000 -P numcpus=8 -P disks=[120] -P nets=[&#39;{&#34;name&#34;:&#34;assisted-net&#34;}&#39;] remote-l3-new1</span>
+</code></pre></div><h2 id=get-host-info>Get host info</h2>
+<h3 id=using-aicli-2>Using AICLI:</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># aicli list host</span>
++----------------+-----------------------+--------------------------------------+---------------------------+--------+-----------------+
+|      Host      |        Cluster        |                  Id                  |           Status          |  Role  |        Ip       |
++----------------+-----------------------+--------------------------------------+---------------------------+--------+-----------------+
+|    master-1    | cluster-rwn-alb2-day2 | da394169-9e9a-46c1-92df-475829e49fe5 |        disconnected       | master |  192.168.7.243  |
+|    master-2    | cluster-rwn-alb2-day2 | bb4748c8-e96e-4994-9675-75d3132eb22e |        disconnected       | master | 192.168.122.252 |
+|    master1     |    cluster-rwn-alb2   | a85027fe-54d2-4a23-a13a-301505d7f818 |         installed         | master | 192.168.122.224 |
+|    master2     |    cluster-rwn-alb2   | 698fde5d-86be-460a-87e5-cf7278fa5d0d |         installed         | master |  192.168.122.30 |
+|    master3     |    cluster-rwn-alb2   | e05e87c4-66aa-4adc-b27a-360f3a87773b |         installed         | master |  192.168.122.46 |
+| remote-l3-new1 | cluster-rwn-alb2-day2 | 4ff12d7b-f22c-48c7-9440-7f64c67961a9 | added-to-existing-cluster | worker |   192.168.7.64  |
+| sno-alb-new10  |    sno-assisted-alb   | 36377c63-4aa2-4cb3-ba1e-5ebdb272e1e9 |         installed         | master | 192.168.122.213 |
+|  worker-rmw1   | cluster-rwn-alb2-day2 | 7d64610d-1cf7-40c5-b0a5-05156478c934 | added-to-existing-cluster | worker | 192.168.122.202 |
++----------------+-----------------------+--------------------------------------+---------------------------+--------+-----------------+
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># aicli info host remote-l3-new1</span>
+api_vip_connectivity: <span style=color:#f92672>{</span><span style=color:#e6db74>&#34;is_success&#34;</span>:true<span style=color:#f92672>}</span>
+checked_in_at: 2021-04-05T08:33:40.617Z
+cluster_id: fcf9d761-21dc-4c92-901f-587940541ed8
+created_at: 2021-04-04T06:37:01.247Z
+id: 4ff12d7b-f22c-48c7-9440-7f64c67961a9
+installation_disk_id: /dev/disk/by-path/pci-0000:00:06.0
+installation_disk_path: /dev/vda
+logs_info: completed
+logs_started_at: 2021-04-05T08:33:12.774Z
+machine_config_pool_name: worker
+ntp_sources: <span style=color:#f92672>[{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;powered-by-acknowledge.as200569.net&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;time.richiemcintosh.com&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;tunnel608577-pt.tunnel.tserv8.dal1.ipv6.he.net&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;mail.light-speed.de&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;2a00:c98:2030:a006:1::1&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;ntp3.torix.ca&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;terminus.darioturchetti.me&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}</span>,<span style=color:#f92672>{</span><span style=color:#e6db74>&#34;source_name&#34;</span>:<span style=color:#e6db74>&#34;ns3.fibertelecom.it&#34;</span>,<span style=color:#e6db74>&#34;source_state&#34;</span>:<span style=color:#e6db74>&#34;unreachable&#34;</span><span style=color:#f92672>}]</span>
+progress: <span style=color:#f92672>{</span><span style=color:#e6db74>&#39;current_stage&#39;</span>: <span style=color:#e6db74>&#39;Rebooting&#39;</span>, <span style=color:#e6db74>&#39;stage_started_at&#39;</span>: <span style=color:#e6db74>&#39;2021-04-05T08:33:13.285Z&#39;</span>, <span style=color:#e6db74>&#39;stage_updated_at&#39;</span>: <span style=color:#e6db74>&#39;2021-04-05T08:33:13.285Z&#39;</span><span style=color:#f92672>}</span>
+requested_hostname: remote-l3-new1
+role: worker
+stage_started_at: 0001-01-01T00:00:00.000Z
+stage_updated_at: 0001-01-01T00:00:00.000Z
+status: added-to-existing-cluster
+status_info: Rebooting
+status_updated_at: 2021-04-05T08:33:13.285Z
+updated_at: 2021-04-05T08:33:40.617Z
+user_name: admin
+
+</code></pre></div><p>You may get also more information adding the <code>--full</code> flag to the previous command.</p>
+<h3 id=using-api-2>Using API</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>
+curl --location --request GET <span style=color:#e6db74>&#39;http://ocp-metal-ui-assisted-installer.apps.qct11.karmalabs.com/api/assisted-install/v1/clusters/fcf9d761-21dc-4c92-901f-587940541ed8/hosts&#39;</span>
+</code></pre></div><p>To get the next expected response:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>&#34;requested_hostname&#34;: </span><span style=color:#e6db74>&#34;remote-l3-new1&#34;</span>,
+       <span style=color:#f92672>&#34;role&#34;: </span><span style=color:#e6db74>&#34;worker&#34;</span>,
+       <span style=color:#f92672>&#34;stage_started_at&#34;: </span><span style=color:#e6db74>&#34;0001-01-01T00:00:00.000Z&#34;</span>,
+       <span style=color:#f92672>&#34;stage_updated_at&#34;: </span><span style=color:#e6db74>&#34;0001-01-01T00:00:00.000Z&#34;</span>,
+       <span style=color:#f92672>&#34;status&#34;: </span><span style=color:#e6db74>&#34;added-to-existing-cluster&#34;</span>,
+       <span style=color:#f92672>&#34;status_info&#34;: </span><span style=color:#e6db74>&#34;Rebooting&#34;</span>,
+       <span style=color:#f92672>&#34;status_updated_at&#34;: </span><span style=color:#e6db74>&#34;2021-04-05T08:33:13.285Z&#34;</span>,
+       <span style=color:#f92672>&#34;updated_at&#34;: </span><span style=color:#e6db74>&#34;2021-04-05T08:33:40.617Z&#34;</span>,
+       <span style=color:#f92672>&#34;user_name&#34;: </span><span style=color:#e6db74>&#34;admin&#34;</span>,
+       <span style=color:#f92672>&#34;validations_info&#34;: </span><span style=color:#e6db74>&#34;{\&#34;hardware\&#34;:[{\&#34;id\&#34;:\&#34;has-inventory\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Valid inventory exists for the host\&#34;},{\&#34;id\&#34;:\&#34;has-min-cpu-cores\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Sufficient CPU cores\&#34;},{\&#34;id\&#34;:\&#34;has-min-memory\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Sufficient minimum RAM\&#34;},{\&#34;id\&#34;:\&#34;has-min-valid-disks\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Sufficient disk capacity\&#34;},{\&#34;id\&#34;:\&#34;has-cpu-cores-for-role\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Sufficient CPU cores for role worker\&#34;},{\&#34;id\&#34;:\&#34;has-memory-for-role\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Sufficient RAM for role worker\&#34;},{\&#34;id\&#34;:\&#34;hostname-unique\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Hostname remote-l3-new1 is unique in cluster\&#34;},{\&#34;id\&#34;:\&#34;hostname-valid\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Hostname remote-l3-new1 is allowed\&#34;},{\&#34;id\&#34;:\&#34;valid-platform\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Platform KVM is allowed\&#34;},{\&#34;id\&#34;:\&#34;sufficient-or-unknown-installation-disk-speed\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Speed of installation disk has not yet been measured\&#34;}],\&#34;network\&#34;:[{\&#34;id\&#34;:\&#34;connected\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Host is connected\&#34;},{\&#34;id\&#34;:\&#34;machine-cidr-defined\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Machine Network CIDR is defined\&#34;},{\&#34;id\&#34;:\&#34;belongs-to-machine-cidr\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Host belongs to machine network CIDR \&#34;},{\&#34;id\&#34;:\&#34;api-vip-connected\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;API VIP connectivity success\&#34;},{\&#34;id\&#34;:\&#34;belongs-to-majority-group\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;Day2 host is not required to be connected to other hosts in the cluster\&#34;},{\&#34;id\&#34;:\&#34;ntp-synced\&#34;,\&#34;status\&#34;:\&#34;failure\&#34;,\&#34;message\&#34;:\&#34;Host couldn&#39;t synchronize with any NTP server\&#34;},{\&#34;id\&#34;:\&#34;container-images-available\&#34;,\&#34;status\&#34;:\&#34;pending\&#34;,\&#34;message\&#34;:\&#34;Missing container images statuses\&#34;}],\&#34;operators\&#34;:[{\&#34;id\&#34;:\&#34;cnv-requirements-satisfied\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;cnv is disabled\&#34;},{\&#34;id\&#34;:\&#34;lso-requirements-satisfied\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;lso is disabled\&#34;},{\&#34;id\&#34;:\&#34;ocs-requirements-satisfied\&#34;,\&#34;status\&#34;:\&#34;success\&#34;,\&#34;message\&#34;:\&#34;ocs is disabled\&#34;}]}&#34;</span>
+
+</code></pre></div><h2 id=update-some-node-attributes>Update some node attributes:</h2>
+<p>It&rsquo;s possible that you have to update some node&rsquo;s attributes like <code>hostname</code>, <code>api_vip</code> and so on:</p>
+<h3 id=using-aicli-3>Using AICLI:</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># aicli update host localhost -P role=worker -P approved=true -P name=remote-l3-new1 -P api_vip=192.168.122.183</span>
+
+</code></pre></div><p>Just to approve the CSR and start the installation successfully</p>
+<h2 id=troubleshooting>TROUBLESHOOTING</h2>
+<h3 id=verify-support-l2-environment>Verify SUPPORT L2 environment:</h3>
+<p>If your new status host (RWN L3 VM) is <strong>“insufficient”</strong>, it could be due to the L2 verification because, for sure, if you&rsquo;re getting your VM in another L3 network, you&rsquo;re in another different broadcast domain so the check (<a href=https://github.com/openshift/assisted-installer-agent/blob/30cdb974bb9f7e5dc1ae5bfe03ad6ed7cd071df0/src/apivip_check/apivip_check.go#L119>https://github.com/openshift/assisted-installer-agent/blob/30cdb974bb9f7e5dc1ae5bfe03ad6ed7cd071df0/src/apivip_check/apivip_check.go#L119</a>) fails.
+To verify that check that the validations:</p>
+<ul>
+<li>Agent (192.168.7.186) and the API.VIP cluster AI (192.168.122.183)</li>
+<li>The agent has connectivity to API VIP cluster</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>core@localhost ~<span style=color:#f92672>]</span>$ ping api.cluster-rwn-alb2.qct11.karmalabs.com
+PING api.cluster-rwn-alb2.qct11.karmalabs.com <span style=color:#f92672>(</span>192.168.122.183<span style=color:#f92672>)</span> 56<span style=color:#f92672>(</span>84<span style=color:#f92672>)</span> bytes of data.
+<span style=color:#ae81ff>64</span> bytes from api.cluster-rwn-alb2.qct11.karmalabs.com <span style=color:#f92672>(</span>192.168.122.183<span style=color:#f92672>)</span>: icmp_seq<span style=color:#f92672>=</span><span style=color:#ae81ff>1</span> ttl<span style=color:#f92672>=</span><span style=color:#ae81ff>63</span> time<span style=color:#f92672>=</span>0.221 ms
+<span style=color:#ae81ff>64</span> bytes from api.cluster-rwn-alb2.qct11.karmalabs.com <span style=color:#f92672>(</span>192.168.122.183<span style=color:#f92672>)</span>: icmp_seq<span style=color:#f92672>=</span><span style=color:#ae81ff>2</span> ttl<span style=color:#f92672>=</span><span style=color:#ae81ff>63</span> time<span style=color:#f92672>=</span>0.332 ms
+</code></pre></div><ul>
+<li>The DNS entry in both networks are configured</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>network default: api.cluster-rwn-alb2.qct11.karmalabs.com |  A   |  <span style=color:#ae81ff>0</span>  | 192.168.122.183
+  remote-l3-worker1.qct11.karmalabs.com   |  A   |  <span style=color:#ae81ff>0</span>  |  192.168.7.186
+  network l3: api.cluster-rwn-alb2.qct11.karmalabs.com |  A   |  <span style=color:#ae81ff>0</span>  | 192.168.122.183
+  remote-l3-worker1.qct11.karmalabs.com   |  A   |  <span style=color:#ae81ff>0</span>  |  192.168.7.186
+
+</code></pre></div><ul>
+<li>The <code>hostname</code> is changed after reboot:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>  <span style=color:#f92672>[</span>core@remote-l3-worker1 ~<span style=color:#f92672>]</span>$
+</code></pre></div><ul>
+<li>But the status is currently insufficient:</li>
+</ul>
+<pre tabindex=0><code>status: insufficient
+status_info: Host cannot be installed due to following failing validation(s): API VIP connectivity failure ; Host couldn't synchronize with any NTP server
+</code></pre><p>In this case, you need to modify the config map to add an environment in order to disable the L2 support, and restart pods to get the node changing the state to “known” and then, after some minutes “installing” and “installed”:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get cm assisted-service-config</span>
+NAME                      DATA   AGE
+assisted-service-config   <span style=color:#ae81ff>21</span>     6d5h
+<span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get cm assisted-service-config -oyaml</span>
+apiVersion: v1
+data:
+ADMIN_USERS: ercohen,lgamliel,mfilanov,ygoldber
+AGENT_DOCKER_IMAGE: quay.io/ocpmetal/assisted-installer-agent:latest
+AUTH_TYPE: none
+BASE_DNS_DOMAINS: <span style=color:#e6db74>&#34;&#34;</span>
+CHECK_CLUSTER_VERSION: <span style=color:#e6db74>&#34;False&#34;</span>
+CONTROLLER_IMAGE: quay.io/ocpmetal/assisted-installer-controller:latest
+CREATE_S3_BUCKET: <span style=color:#e6db74>&#34;true&#34;</span>
+ENABLE_KUBE_API: <span style=color:#e6db74>&#34;true&#34;</span>
+ENABLE_SINGLE_NODE_DNSMASQ: <span style=color:#e6db74>&#34;True&#34;</span>
+INSTALLER_IMAGE: quay.io/ocpmetal/assisted-installer:latest
+IPV6_SUPPORT: <span style=color:#e6db74>&#34;True&#34;</span>
+JWKS_URL: https://api.openshift.com/.well-known/jwks.json
+NAMESPACE: assisted-installer
+OCM_BASE_URL: https://api-integration.6943.hive-integration.openshiftapps.com
+OPENSHIFT_VERSIONS: <span style=color:#e6db74>&#39;{&#34;4.6&#34;:{&#34;display_name&#34;:&#34;4.6.16&#34;,&#34;release_image&#34;:&#34;quay.io/openshift-release-dev/ocp-release:4.6.16-x86_64&#34;,&#34;rhcos_image&#34;:&#34;http://[1001:db9::1]/rhcos-4.6.8-x86_64-live.x86_64.iso&#34;,&#34;rhcos_version&#34;:&#34;46.82.202012051820-0&#34;,&#34;support_level&#34;:&#34;production&#34;},&#34;4.7&#34;:{&#34;display_name&#34;:&#34;4.7-pre-release&#34;,&#34;release_image&#34;:&#34;quay.io/openshift-release-dev/ocp-release:4.7.0-rc.2-x86_64&#34;,&#34;rhcos_image&#34;:&#34;http://[1001:db9::1]/rhcos-4.7.0-rc.2-x86_64-live.x86_64.iso&#34;,&#34;rhcos_version&#34;:&#34;47.83.202102090044-0&#34;,&#34;support_level&#34;:&#34;beta&#34;},&#34;4.8&#34;:{&#34;display_name&#34;:&#34;single-node-4.8-alpha&#34;,&#34;release_image&#34;:&#34;registry.ci.openshift.org/ocp/release:4.8.0-0.ci-2021-03-30-063145&#34;,&#34;rhcos_image&#34;:&#34;http://[1001:db9::1]/rhcos-4.7.0-rc.2-x86_64-live.x86_64.iso&#34;,&#34;rhcos_version&#34;:&#34;47.83.202102090044-0&#34;,&#34;support_level&#34;:&#34;beta&#34;}}&#39;</span>
+PUBLIC_CONTAINER_REGISTRIES: quay.io
+SELF_VERSION: quay.io/ocpmetal/assisted-service:latest
+SERVICE_BASE_URL: http://assisted-service-assisted-installer.apps.qct11.karmalabs.com
+SKIP_CERT_VERIFICATION: <span style=color:#e6db74>&#34;true&#34;</span>
+
+SUPPORT_L2: <span style=color:#e6db74>&#34;False&#34;</span>
+
+WITH_AMS_SUBSCRIPTIONS: <span style=color:#e6db74>&#34;False&#34;</span>
+kind: ConfigMap
+metadata:
+annotations:
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/ title="Remote Worker Node in Day2 spoke cluster to add worker nodes"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Remote Worker Node in Day2 spoke cluster to add worker nodes</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/ title="Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts">Next - Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

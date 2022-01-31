@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>UPI on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/upi/</link>
+    <description>Recent content in UPI on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/upi/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Manual SNO on baremetal</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</guid>
+      <description>Reference Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-manual-sno-upi-baremetal
+External ref: https://github.com/eranco74/bootstrap-in-place-poc
+First of all, download the rhcos-live image curl -Lk https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-live.x86_64.iso &amp;gt; /var/lib/libvirt/images/rhcos-live.x86_64.iso Create an install config (take a look at the “samples” folder in lab-manual-sno-upi-baremetal) You need to add the SSH pub key and the pull secret to your install-config.yaml.
+# Set to 0 the number of workers compute.replicas: 0 # Set to 1 the number of masters controlPlane.replicas: 1 # Set platform to none platform.</description>
+    </item>
+    
+  </channel>
+</rss>

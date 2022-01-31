@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>labs on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/labs/</link>
+    <description>Recent content in labs on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/labs/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LocalStorage</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/localstorage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/localstorage/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator
+Deploy 5 disks for each nodes # kcli create disk -s 10 qct11-master-x ---scripted for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done Create the local storage operator  namespace operator group subscription  1-. Namespace: To do that just oc apply -f 01-LS-namespace.yml:
+--- apiVersion: v1 kind: Namespace metadata: name: openshift-local-storage 2-. Operator group:</description>
+    </item>
+    
+    <item>
+      <title>Hive</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/hive/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/hive/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hive-operator
+Hive Operator --- apiVersion: operators.coreos.com/v1 kind: OperatorGroup metadata: name: global-operators namespace: openshift-operators spec: targetNamespaces: - openshift-operators --- apiVersion: operators.coreos.com/v1alpha1 kind: Subscription metadata: name: hive-operator namespace: openshift-operators spec: channel: alpha installPlanApproval: Automatic name: hive-operator source: community-operators sourceNamespace: openshift-marketplace startingCSV: hive-operator.v1.1.2 </description>
+    </item>
+    
+    <item>
+      <title>Assisted Installer</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/</guid>
+      <description>Reference  Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator External Operator ref: https://github.com/openshift/assisted-service quay.io reference tag: https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags  Assisted Installer Operator Catalog Source First thing is to create the catalog source with the quay image from the Development team.
+The only thing we need to change is the tag for the image using the reference url
+--- apiVersion: operators.coreos.com/v1alpha1 kind: CatalogSource metadata: name: assisted-service namespace: openshift-marketplace spec: image: quay.io/ocpmetal/assisted-service-index:&amp;lt;tag from quay.io&amp;gt; sourceType: grpc  In case you want to go with the version of the Operator Hub, in the extra folder you&amp;rsquo;ve got the file assisted-installer-CS-operatorHub.</description>
+    </item>
+    
+    <item>
+      <title>Labs index</title>
+      <link>https://pages.sysdeseng.com/labs/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/</guid>
+      <description>Disclaimer &amp;nbsp;UNSUPPORTED This repository and its contents are completely UNSUPPORTED in any way and are not part of official documentation.   &amp;nbsp;Contribute! The documents hosted here are just personal notes, if you feel that you can contribute into polishing them as guides, feel free to let us know via issues to this repository:
+https://gihub.com/RHsyseng/labs
+  Description The idea of this repository is to offer everything necessary to automate the deployment processes of OpenShift laboratories and operators, as well as to document those deployments.</description>
+    </item>
+    
+    <item>
+      <title>Day2 with spoke cluster to add worker nodes</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Day2 workflow to add worker nodes 1-. Deploy hub cluster (Requirements)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirements)
+3-. Finish the spoke cluster installation (multinode 3 nodes)</description>
+    </item>
+    
+    <item>
+      <title>Day2 with spoke cluster to add worker nodes</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Day2 workflow to add worker nodes 1-. Deploy hub cluster (Requirements)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirements)
+3-. Finish the spoke cluster installation (multinode 3 nodes)</description>
+    </item>
+    
+    <item>
+      <title>kcli with Metal³ and IPv4 connected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-metal3.yml  AUTOMATIC installation with this three parameters, the installation will be automatic from scratch to finish:
+ lab:true launch_steps: true deploy_openshift: true  Edit your lab-metal3.yml maybe you could copy from file .example in kcli plan:
+lab: true version: ci provisioning_enable: false virtual_protocol: redfish uefi_legacy: true virtual_masters: true virtual_workers: false launch_steps: true deploy_openshift: true cluster: test-ci domain: alklabs.</description>
+    </item>
+    
+    <item>
+      <title>kcli with Metal³ and IPv6 disconnected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab_ipv6.yml  Requirements: This documents, starts from an installation ready with IPI Baremetal 4.8 - Disconnected / IPv6 but using virtual VM to simulate a real scenario.
+In our case, we don&amp;rsquo;t need the lab mode so we&amp;rsquo;re just installing using the next lab.yml.
+AUTOMATIC installation With this three parameters, the installation will be automatic from scratch to finish:</description>
+    </item>
+    
+    <item>
+      <title>kcli without Metal³ and IPv4 connected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-withoutMetal3.yml  Prepare the environment OCP previous installation: We&amp;rsquo;re going to deploy an IPI cluster (all versions, but for the example, we will use 4.8) using kcli to deploy ASAP.
+In this example, we&amp;rsquo;ve got two kinds of deployment:
+ SNO Multinode  The first one is the multi-node. To deploy the multi-node OCP cluster:</description>
+    </item>
+    
+    <item>
+      <title>Late Binding adding new agents</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) Hive operator installed AI installed  Create the pull secret You need to create a secret in the cluster that contains the pull secret for the registry.
+apiVersion: v1 kind: Secret metadata: name: assisted-deployment-pull-secret namespace: assisted-installer stringData: .dockerconfigjson: &amp;#39;PULL_SECRET&amp;#39; # replace with your pull secret type: kubernetes.io/dockerconfigjson Create the private ssh key You need to create a secret in the cluster that contains the private ssh key for the registry.</description>
+    </item>
+    
+    <item>
+      <title>Manual SNO on baremetal</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/</guid>
+      <description>Reference Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-manual-sno-upi-baremetal
+External ref: https://github.com/eranco74/bootstrap-in-place-poc
+First of all, download the rhcos-live image curl -Lk https://mirror.openshift.com/pub/openshift-v4/dependencies/rhcos/latest/latest/rhcos-live.x86_64.iso &amp;gt; /var/lib/libvirt/images/rhcos-live.x86_64.iso Create an install config (take a look at the “samples” folder in lab-manual-sno-upi-baremetal) You need to add the SSH pub key and the pull secret to your install-config.yaml.
+# Set to 0 the number of workers compute.replicas: 0 # Set to 1 the number of masters controlPlane.replicas: 1 # Set platform to none platform.</description>
+    </item>
+    
+    <item>
+      <title>OpenShift 4.7 on AWS</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/</guid>
+      <description>reference:
+Lab Folder: N/A (There is not Lab folder created for this one because we&amp;rsquo;re following the official cloud doc to get the binary and installing directly)
+URL guides followed:  GCP: https://www.openshift.com/blog/ocp-4.6-install-on-gcp-cloud-the-smooth-experience AWS: https://docs.openshift.com/container-platform/4.7/installing/installing_aws/installing-aws-default.html  Download IPI installer. There are two ways:
+ Mirror: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/ Official site: https://cloud.redhat.com/openshift/create/cloud and https://cloud.redhat.com/openshift/install/aws  Procedure:
+ Download the IPI installer from the web. Download the pull secret Install oc client in your path if you didn’t install it before  Configure DNS zone When IPI installer is run, one of the interactive steps looks for DNS name to use in the cluster.</description>
+    </item>
+    
+    <item>
+      <title>Physical IPv6 Disconnected Lab</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/</guid>
+      <description>In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.
+Hosts hostname: bm-cluster-1-hyper.e2e.bos.redhat.com
+&amp;nbsp;danger Must use kni user instead of root, so su - kni   References Lab Folder: N/A (There isn&amp;rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)
+Lab info https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md</description>
+    </item>
+    
+    <item>
+      <title>Red Hat Advanced Cluster Management (ACM)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/rhacm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/rhacm/</guid>
+      <description>References:   Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+  quay.io RHACM tags: https://quay.io/repository/acm-d/acm-custom-registry?tab=tags
+  quay.io RHACM bundle: https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags
+  official doc for deployment: https://github.com/open-cluster-management/deploy
+  The way to deploy: https://github.com/jparrill/ztp-the-hard-way
+  Requirements  Existing OCP cluster ready. Follow this instructions to get ready: https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md LocalStorage deployed on the OCP cluster. Follow these instructions to get deployed: https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md. Remember if you&amp;rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of LS.</description>
+    </item>
+    
+    <item>
+      <title>Remote Worker Node in Day2 spoke cluster to add worker nodes</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/</guid>
+      <description>Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Remote worker node into Day2 spoke cluster workflow 1-. Deploy hub cluster (Requirement)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirement)
+3-. Finish the spoke cluster installation (multinode 3 nodes)</description>
+    </item>
+    
+    <item>
+      <title>RWN to Assisted Installer using AICLI API</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api
+Scenario Description Once we&amp;rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful to add new remote worker nodes (maybe worker nodes using the same network)
+In this case, we&amp;rsquo;ve got 2 possibilities to do that:
+ Using the API or maybe an abstraction using AICLI Using the CRD operator (not developed yet)  Requirement We need an environment with:
+ Hub deployment ready (UPI,IPI whatever) AI operator + Hive + LocalStorage Cluster 3 multi-node (not possible to do using SNO).</description>
+    </item>
+    
+    <item>
+      <title>Using Advanced Cluster Management (ACM)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&amp;rsquo;re going to use for the deployment. If you have some doubts you could use the next tool to verify it: pull secret validator</description>
+    </item>
+    
+    <item>
+      <title>Using Assisted Installer (AI)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-AI To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&amp;rsquo;re going to use. If you have some doubts you could use the next tool to verify it: pull secret validator</description>
+    </item>
+    
+    <item>
+      <title>Virtual over ACM</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-acm
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over RHACM. This lab uses sushy tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready ACM with AI Operator ready  Install sushy-tools &amp;nbsp;Information If you&amp;rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -&amp;gt; you could omit this step because it is already installed.</description>
+    </item>
+    
+    <item>
+      <title>Virtual over Assisted Installer</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over Assisted Installer. This lab uses sushy-tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready Assisted Installer Operator ready  Install sushy-tools &amp;nbsp;Information If you&amp;rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -&amp;gt; you could omit this step because it is already installed.</description>
+    </item>
+    
+    <item>
+      <title>ZTP The Hard Way</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/</guid>
+      <description>References: ZTP For Telco Edge 5G  What is ZTP? Context on ZTP architecture  Disconnected ZTP Flow Connected ZTP Flow ZTP Hub Components   How to start with ZTP?    References:  The original repository: https://github.com/jparrill/ztp-the-hard-way  ZTP For Telco Edge 5G Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&amp;rsquo;s get started from the beginning with some context and theory.</description>
+    </item>
+    
+  </channel>
+</rss>

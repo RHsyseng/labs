@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>kcli on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/kcli/</link>
+    <description>Recent content in kcli on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/kcli/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>kcli with Metal³ and IPv4 connected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-metal3.yml  AUTOMATIC installation with this three parameters, the installation will be automatic from scratch to finish:
+ lab:true launch_steps: true deploy_openshift: true  Edit your lab-metal3.yml maybe you could copy from file .example in kcli plan:
+lab: true version: ci provisioning_enable: false virtual_protocol: redfish uefi_legacy: true virtual_masters: true virtual_workers: false launch_steps: true deploy_openshift: true cluster: test-ci domain: alklabs.</description>
+    </item>
+    
+    <item>
+      <title>kcli with Metal³ and IPv6 disconnected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab_ipv6.yml  Requirements: This documents, starts from an installation ready with IPI Baremetal 4.8 - Disconnected / IPv6 but using virtual VM to simulate a real scenario.
+In our case, we don&amp;rsquo;t need the lab mode so we&amp;rsquo;re just installing using the next lab.yml.
+AUTOMATIC installation With this three parameters, the installation will be automatic from scratch to finish:</description>
+    </item>
+    
+    <item>
+      <title>kcli without Metal³ and IPv4 connected</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/</guid>
+      <description>References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-withoutMetal3.yml  Prepare the environment OCP previous installation: We&amp;rsquo;re going to deploy an IPI cluster (all versions, but for the example, we will use 4.8) using kcli to deploy ASAP.
+In this example, we&amp;rsquo;ve got two kinds of deployment:
+ SNO Multinode  The first one is the multi-node. To deploy the multi-node OCP cluster:</description>
+    </item>
+    
+  </channel>
+</rss>

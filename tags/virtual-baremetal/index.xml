@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Virtual Baremetal on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/virtual-baremetal/</link>
+    <description>Recent content in Virtual Baremetal on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/virtual-baremetal/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Virtual over ACM</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-acm
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over RHACM. This lab uses sushy tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready ACM with AI Operator ready  Install sushy-tools &amp;nbsp;Information If you&amp;rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -&amp;gt; you could omit this step because it is already installed.</description>
+    </item>
+    
+    <item>
+      <title>Virtual over Assisted Installer</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over Assisted Installer. This lab uses sushy-tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready Assisted Installer Operator ready  Install sushy-tools &amp;nbsp;Information If you&amp;rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -&amp;gt; you could omit this step because it is already installed.</description>
+    </item>
+    
+  </channel>
+</rss>

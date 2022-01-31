@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>LocalStorage on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/localstorage/</link>
+    <description>Recent content in LocalStorage on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/localstorage/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LocalStorage</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/localstorage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/localstorage/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator
+Deploy 5 disks for each nodes # kcli create disk -s 10 qct11-master-x ---scripted for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done Create the local storage operator  namespace operator group subscription  1-. Namespace: To do that just oc apply -f 01-LS-namespace.yml:
+--- apiVersion: v1 kind: Namespace metadata: name: openshift-local-storage 2-. Operator group:</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,388 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Remote Worker Node in Day2 spoke cluster to add worker nodes - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Remote Worker Node in Day2 spoke cluster to add worker nodes">
+<meta property="og:description" content="Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Remote worker node into Day2 spoke cluster workflow 1-. Deploy hub cluster (Requirement)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirement)
+3-. Finish the spoke cluster installation (multinode 3 nodes)">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Remote Worker Node in Day2 spoke cluster to add worker nodes">
+<meta name=twitter:description content="Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Remote worker node into Day2 spoke cluster workflow 1-. Deploy hub cluster (Requirement)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirement)
+3-. Finish the spoke cluster installation (multinode 3 nodes)">
+<meta itemprop=name content="Remote Worker Node in Day2 spoke cluster to add worker nodes">
+<meta itemprop=description content="Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) spoke cluster multinode installed. You could use the deploy.sh script to accomplish this.  Remote worker node into Day2 spoke cluster workflow 1-. Deploy hub cluster (Requirement)
+2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirement)
+3-. Finish the spoke cluster installation (multinode 3 nodes)">
+<meta itemprop=wordCount content="1401"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="RWN,Assisted Installer,day2,labs,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Remote Worker Node in Day2 spoke cluster to add worker nodes</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#requirements>Requirements</a></li>
+<li><a href=#remote-worker-node-into-day2-spoke-cluster-workflow>Remote worker node into Day2 spoke cluster workflow</a>
+<ul>
+<li><a href=#considerations-to-the-lab-environment>Considerations to the lab environment</a></li>
+</ul>
+</li>
+<li><a href=#verify-the-multinode-spoke-cluster-installation>Verify the multinode spoke cluster installation</a></li>
+<li><a href=#new-worker-node-to-be-added-to-the-cluster>New worker node to be added to the cluster</a></li>
+<li><a href=#downloading-kubeconfig-from-the-spoke-cluster>Downloading Kubeconfig from the spoke cluster</a></li>
+<li><a href=#validate-the-worker-node-will-be-available-and-ready-to-use>Validate the worker node will be available and ready to use</a></li>
+</ul>
+</nav></aside>
+<h2 id=requirements>Requirements</h2>
+<p>The starting point of this document is based on the following things installed previously:</p>
+<ul>
+<li><a href=https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal>Hub clusters ocp ipi baremetal installed (multinode)</a></li>
+<li><a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-AI>spoke cluster multinode installed</a>. You could use the deploy.sh script to accomplish this.</li>
+</ul>
+<h2 id=remote-worker-node-into-day2-spoke-cluster-workflow>Remote worker node into Day2 spoke cluster workflow</h2>
+<p>1-. Deploy hub cluster (Requirement)</p>
+<p>2-. Add bmh crs to hub clusters (in order to deploy spoke cluster multi node) (Requirement)</p>
+<p>3-. Finish the spoke cluster installation (multinode 3 nodes)</p>
+<p>4-. Create the new VM into a different L3 network</p>
+<p>5-. Add new manifest to create a new bmh on hub cluster (in this case with the worker role)</p>
+<p>6-. Automatically cluster will be cluster-day2 and the worker will be added to the spoke cluster as a worker.</p>
+<p>7-. Download kubeconfig for spoke-cluster</p>
+<p>8-. Validate oc get nodes to have 3 nodes master and the new worker node in a different L3 network</p>
+<h3 id=considerations-to-the-lab-environment>Considerations to the lab environment</h3>
+<ul>
+<li>
+<p>During the lab setup we&rsquo;ve found the next bug to use the hostname created with the annotation:
+<a href=https://github.com/openshift/assisted-service/pull/2586>PR hostname</a></p>
+</li>
+<li>
+<p>After solved with a local <a href=http://quay.io/fpercoco/assisted-service:hostname-from-spec>image</a>
+to validate the PR fix the problem, everything is working fine with latest.</p>
+</li>
+<li>
+<p>Verified the pull request for RWN: <a href=https://github.com/openshift/assisted-service/pull/2585>PR RWN</a></p>
+</li>
+<li>
+<p>With Libvirt and firewalld is necessary modify firewalld (stop firewalld or maybe add new rules to communicate both L3 networks)</p>
+</li>
+<li>
+<p>Deployment used in lab-index: <a href=https://github.com/RHsyseng/labs-index/actions/runs/1252805471>https://github.com/RHsyseng/labs-index/actions/runs/1252805471</a></p>
+</li>
+<li>
+<p>In this case the vm will be in a different L3 network. Just to make easy:</p>
+<ul>
+<li>Network <strong>Bare-net</strong>: <code>192.168.150.0/24</code> In this network will be Hub and Spoke cluster nodes/vm</li>
+<li>Network <strong>Default</strong>: <code>192.168.122.0/24</code> In this network will be the remote worker node</li>
+</ul>
+</li>
+</ul>
+<h2 id=verify-the-multinode-spoke-cluster-installation>Verify the multinode spoke cluster installation</h2>
+<p>Once the spoke cluster is installed, you can verify the installation by running the following command:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get nodes</span>
+NAME               STATUS   ROLES                   AGE     VERSION
+test-ci-master-0   Ready    master,virtual,worker   3h22m   v1.21.1+f36aa36
+test-ci-master-1   Ready    master,virtual,worker   3h23m   v1.21.1+f36aa36
+test-ci-master-2   Ready    master,virtual,worker   3h23m   v1.21.1+f36aa36
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get bmh</span>
+NAME         STATE         CONSUMER   ONLINE   ERROR
+lab-agent1   provisioned              true
+lab-agent2   provisioned              true
+lab-agent3   provisioned              true
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get agent</span>
+NAME                                   CLUSTER       APPROVED   ROLE     STAGE
+0211833c-5a24-4ee0-bfd7-7d866cb9da56   lab-cluster   true       master   Done
+33ec7440-9e9c-46a1-896d-e5a13e1553cd   lab-cluster   true       master   Done
+96b2009e-f3eb-458c-862b-2d1dac1e2e08   lab-cluster   true       master   Done
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get agent -o wide</span>
+NAME                                   CLUSTER       APPROVED   ROLE     STAGE   HOSTNAME    REQUESTED HOSTNAME
+0211833c-5a24-4ee0-bfd7-7d866cb9da56   lab-cluster   true       master   Done    localhost   spoke-3
+33ec7440-9e9c-46a1-896d-e5a13e1553cd   lab-cluster   true       master   Done    localhost   spoke-2
+96b2009e-f3eb-458c-862b-2d1dac1e2e08   lab-cluster   true       master   Done    localhost   spoke-1
+</code></pre></div><p>The installation of the new spoke cluster should be completed:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get agentclusterinstall -oyaml</span>
+...
+  status:
+    conditions:
+
+    - lastProbeTime: <span style=color:#e6db74>&#34;2021-09-09T11:43:03Z&#34;</span>
+      lastTransitionTime: <span style=color:#e6db74>&#34;2021-09-09T11:43:03Z&#34;</span>
+      **message: <span style=color:#e6db74>&#39;The installation has completed: Cluster is installed&#39;</span>**
+      reason: InstallationCompleted
+      status: <span style=color:#e6db74>&#34;True&#34;</span>
+      type: Completed
+</code></pre></div><p>Remember that the agentclusterinstall manifest when you&rsquo;re using a multinode spoke cluster should be similar to:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>extensions.hive.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>AgentClusterInstall</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-cluster-aci</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>apiVIP</span>: <span style=color:#ae81ff>192.168.150.243</span>                  <span style=color:#75715e># replace with your value</span>
+  <span style=color:#f92672>ingressVIP</span>: <span style=color:#ae81ff>192.168.150.242</span>              <span style=color:#75715e># replace with your value</span>
+  <span style=color:#f92672>clusterDeploymentRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-cluster</span>
+  <span style=color:#f92672>imageSetRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>openshift-v4.8.0</span>
+  <span style=color:#f92672>networking</span>:
+    <span style=color:#f92672>clusterNetwork</span>:
+      - <span style=color:#f92672>cidr</span>: <span style=color:#ae81ff>10.128.0.0</span><span style=color:#ae81ff>/14</span>
+        <span style=color:#f92672>hostPrefix</span>: <span style=color:#ae81ff>23</span>
+    <span style=color:#f92672>serviceNetwork</span>:
+      - <span style=color:#ae81ff>172.30.0.0</span><span style=color:#ae81ff>/16</span>
+  <span style=color:#f92672>provisionRequirements</span>:
+    <span style=color:#f92672>controlPlaneAgents</span>: <span style=color:#ae81ff>NUMBER_OF_MASTERS  </span> <span style=color:#75715e># replace with your value</span>
+  <span style=color:#f92672>sshPublicKey</span>: <span style=color:#ae81ff>PUB_SSH_KEY                </span> <span style=color:#75715e># replace with your value</span>
+</code></pre></div><p>As you can see, with 3 nodes you don&rsquo;t need to specify the MachineNetwork.</p>
+<h2 id=new-worker-node-to-be-added-to-the-cluster>New worker node to be added to the cluster</h2>
+<p>Once we have the spoke cluster deployed, the cluster will be a day2 cluster</p>
+<pre tabindex=0><code>  state: adding-hosts
+      stateInfo: Cluster is installed
+</code></pre><p>It does means that the cluster is ready to be used accepting new worker nodes.</p>
+<ul>
+<li>Create a new virtual machine with the following parameters:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>  kcli create vm -P uefi_legacy<span style=color:#f92672>=</span>true -P start<span style=color:#f92672>=</span>false -P nets<span style=color:#f92672>=[</span><span style=color:#e6db74>&#39;{&#34;name&#34;:&#34;default&#34;, &#34;mac&#34;:&#34;ee:bb:aa:ee:1e:1f&#34;}&#39;</span><span style=color:#f92672>]</span> -P memory<span style=color:#f92672>=</span><span style=color:#ae81ff>38000</span> -P numcpus<span style=color:#f92672>=</span><span style=color:#ae81ff>8</span> -P disks<span style=color:#f92672>=[</span>280<span style=color:#f92672>]</span> agent4
+</code></pre></div><p>In this case the vm will be in a different L3 network. Just to make easy:</p>
+<ul>
+<li>Network <strong>Bare-net</strong>: 192.168.150.0/24 In this network will be Hub and Spoke cluster nodes/vm</li>
+<li>Network <strong>Default</strong>: 192.168.122.0/24 In this network will be the remote worker node</li>
+</ul>
+<p>So with this info we will have something like this. The agent7 will be the remote worker node in a different L3 Network as you can see here:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>$ kcli list vm
++-------------------+--------+-----------------+--------------------------------------------------------+---------+---------+
+|        Name       | Status |       Ips       |                         Source                         |   Plan  | Profile |
++-------------------+--------+-----------------+--------------------------------------------------------+---------+---------+
+|       agent1      |   up   | 192.168.150.225 |                                                        |  kvirt  |  kvirt  |
+|       agent2      |   up   | 192.168.150.226 |                                                        |  kvirt  |  kvirt  |
+|       agent3      |   up   | 192.168.150.227 |                                                        |  kvirt  |  kvirt  |
+|       agent4      |   up   |  192.168.122.8  |                                                        |  kvirt  |  kvirt  |
+| test-ci-installer |   up   | 192.168.150.209 | CentOS-8-GenericCloud-8.4.2105-20210603.0.x86_64.qcow2 | test-ci |  kvirt  |
+|  test-ci-master-0 |   up   |  192.168.150.10 |                                                        | test-ci |  kvirt  |
+|  test-ci-master-1 |   up   |  192.168.150.11 |                                                        | test-ci |  kvirt  |
+|  test-ci-master-2 |   up   |  192.168.150.12 |                                                        | test-ci |  kvirt  |
++-------------------+--------+-----------------+--------------------------------------------------------+---------+---------+
+</code></pre></div><p>The VM agent 4 at the beginning is stopped and then with metal3 will be started once the bmh is created.</p>
+<ul>
+<li>Creation of new baremetal host with the following parameters. One of the parameters is the role which in this case will be worker:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>bmc-secret4</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>password</span>: ---<span style=color:#ae81ff>redacted---</span>
+  <span style=color:#f92672>username</span>: ---<span style=color:#ae81ff>redacted---</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Opaque</span>
+
+
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>metal3.io/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>BareMetalHost</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-agent4</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>infraenvs.agent-install.openshift.io</span>: <span style=color:#e6db74>&#34;lab-env&#34;</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>inspect.metal3.io</span>: <span style=color:#ae81ff>disabled</span>
+    <span style=color:#f92672>bmac.agent-install.openshift.io/role</span>: <span style=color:#ae81ff>worker</span>
+    <span style=color:#f92672>bmac.agent-install.openshift.io/hostname</span>: <span style=color:#e6db74>&#34;spoke4&#34;</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>online</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bmc</span>:
+    <span style=color:#f92672>address</span>: <span style=color:#ae81ff>redfish-virtualmedia+http://192.168.150.149:8000/redfish/v1/Systems/2a93e59f-2d0b-47e7-a103-24e97ccb2639</span>
+    <span style=color:#f92672>credentialsName</span>: <span style=color:#ae81ff>bmc-secret4</span>
+    <span style=color:#f92672>disableCertificateVerification</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bootMACAddress</span>: <span style=color:#ae81ff>ee:bb:aa:ee:1e:1f</span>
+  <span style=color:#f92672>automatedCleaningMode</span>: <span style=color:#ae81ff>disabled</span>
+</code></pre></div><p>As usual, the ID of the new VM is: 2a93e59f-2d0b-47e7-a103-24e97ccb2639 and the Mac Address: ee:bb:aa:ee:1e:1f</p>
+<p>After create the manifest the new baremetal host will be provisioned:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#f92672>[</span>root@qct-d14u11 labs-index<span style=color:#f92672>]</span><span style=color:#75715e># oc get bmh</span>
+NAME         STATE          CONSUMER   ONLINE   ERROR
+lab-agent1   provisioned               true
+lab-agent2   provisioned               true
+lab-agent3   provisioned               true
+lab-agent4   provisioning              true
+
+<span style=color:#f92672>[</span>root@qct-d14u11 labs-index<span style=color:#f92672>]</span><span style=color:#75715e># oc get bmh</span>
+NAME         STATE         CONSUMER   ONLINE   ERROR
+lab-agent1   provisioned              true
+lab-agent2   provisioned              true
+lab-agent3   provisioned              true
+lab-agent4   provisioned              true
+</code></pre></div><p>Once the Rhcos will be installed, the agent will be added to the cluster, doing the auto-approval, and setting the role worker:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>
+<span style=color:#f92672>[</span>root@qct-d14u11 labs-index<span style=color:#f92672>]</span><span style=color:#75715e># oc get agent</span>
+NAME                                   CLUSTER       APPROVED   ROLE          STAGE
+0211833c-5a24-4ee0-bfd7-7d866cb9da56   lab-cluster   true       master        Done
+2a93e59f-2d0b-47e7-a103-24e97ccb2639   lab-cluster   false      auto-assign
+33ec7440-9e9c-46a1-896d-e5a13e1553cd   lab-cluster   true       master        Done
+96b2009e-f3eb-458c-862b-2d1dac1e2e08   lab-cluster   true       master        Done
+
+<span style=color:#f92672>[</span>root@qct-d14u11 labs-index<span style=color:#f92672>]</span><span style=color:#75715e># oc get agent</span>
+NAME                                   CLUSTER       APPROVED   ROLE     STAGE
+0211833c-5a24-4ee0-bfd7-7d866cb9da56   lab-cluster   true       master   Done
+2a93e59f-2d0b-47e7-a103-24e97ccb2639   lab-cluster   true       worker
+33ec7440-9e9c-46a1-896d-e5a13e1553cd   lab-cluster   true       master   Done
+96b2009e-f3eb-458c-862b-2d1dac1e2e08   lab-cluster   true       master   Done
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get bmh -owide</span>
+NAME         STATUS     STATE         CONSUMER   BMC                                                                                                       HARDWARE_PROFILE   ONLINE   ERROR
+lab-agent1   detached   provisioned              redfish-virtualmedia+http://192.168.150.72:8000/redfish/v1/Systems/2f5dbb55-65db-4222-a75f-db1935ff2c46   unknown            true
+lab-agent2   detached   provisioned              redfish-virtualmedia+http://192.168.150.72:8000/redfish/v1/Systems/5aa7ef45-8c76-4e60-b254-d2d69d00ea65   unknown            true
+lab-agent3   detached   provisioned              redfish-virtualmedia+http://192.168.150.72:8000/redfish/v1/Systems/8f9c024e-ef96-4586-9521-92e5c664fe04   unknown            true
+lab-agent4   OK         provisioned              redfish-virtualmedia+http://192.168.150.72:8000/redfish/v1/Systems/ad3c14e9-4956-4972-818d-cb51cc6a1de8   unknown            true
+</code></pre></div><h2 id=downloading-kubeconfig-from-the-spoke-cluster>Downloading Kubeconfig from the spoke cluster</h2>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>$ oc get secret lab-cluster-admin-kubeconfig -o jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.data.kubeconfig}&#39;</span> | base64 -d &gt; kubeconfig
+$ export KUBECONFIG<span style=color:#f92672>=</span>kubeconfig
+</code></pre></div><p>Now you can use the oc commands to interact with the spoke cluster.</p>
+<h2 id=validate-the-worker-node-will-be-available-and-ready-to-use>Validate the worker node will be available and ready to use</h2>
+<p>Inside of the spoke cluster you can validate the worker node is ready to use.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get bmh -owide -A</span>
+NAMESPACE               NAME         STATUS       STATE                    CONSUMER                 BMC                                                                                                        HARDWARE_PROFILE   ONLINE   ERROR
+assisted-installer      lab-agent4                                                                  redfish-virtualmedia+http://192.168.150.149:8000/redfish/v1/Systems/ad3c14e9-4956-4972-818d-cb51cc6a1de8                      true
+openshift-machine-api   lab-agent4   OK           externally provisioned   lab-cluster-lab-agent4   redfish-virtualmedia+http://192.168.150.72:8000/redfish/v1/Systems/ad3c14e9-4956-4972-818d-cb51cc6a1de8                       true
+openshift-machine-api   spoke-1      discovered   unmanaged                spoke-gbb88-master-0                                                                                                                                   true
+openshift-machine-api   spoke-2      discovered   unmanaged                spoke-gbb88-master-1                                                                                                                                   true
+openshift-machine-api   spoke-3      discovered   unmanaged                spoke-gbb88-master-2                                                                                                                                   true
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get machine -A -owide</span>
+NAMESPACE               NAME                     PHASE         TYPE   REGION   ZONE   AGE     NODE      PROVIDERID                                                                               STATE
+openshift-machine-api   lab-cluster-lab-agent4   Provisioned                          3m26s             baremetalhost:///openshift-machine-api/lab-agent4/47b03922-e50c-45b8-a2c0-d130c3a4e41d   externally provisioned
+openshift-machine-api   spoke-gbb88-master-0     Running                              83m     spoke-1   baremetalhost:///openshift-machine-api/spoke-1/12b9d7ec-19c5-4e3d-8e52-79ebf447c2a0      unmanaged
+openshift-machine-api   spoke-gbb88-master-1     Running                              83m     spoke-2   baremetalhost:///openshift-machine-api/spoke-2/f152f428-6bb9-4db7-970c-abf958d3d664      unmanaged
+openshift-machine-api   spoke-gbb88-master-2     Running                              83m     spoke-3   baremetalhost:///openshift-machine-api/spoke-3/4d60f82d-c85b-4d63-9e3f-9fb3e606be49      unmanaged
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>NAME                                   CLUSTER       APPROVED   ROLE     STAGE                       HOSTNAME    REQUESTED HOSTNAME
+07c0d469-60cf-45e6-9e26-3060c8f8fcf2   lab-cluster   true	master   Done                        localhost   spoke-3
+46fe100f-2078-4ef9-9d18-93fc8444f55d   lab-cluster   true	master   Done                        localhost   spoke-1
+76a0081a-e408-47c7-ac3a-4ad564d910b7   lab-cluster   true	worker   Waiting <span style=color:#66d9ef>for</span> control plane   localhost   spoke-4
+a72cbb4d-30d6-446b-805c-e4defdc07fc3   lab-cluster   true	master   Done                        localhost   spoke-2
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh>NAME                                   CLUSTER       APPROVED   ROLE     STAGE   HOSTNAME    REQUESTED HOSTNAME
+07c0d469-60cf-45e6-9e26-3060c8f8fcf2   lab-cluster   true	master   Done    localhost   spoke-3
+46fe100f-2078-4ef9-9d18-93fc8444f55d   lab-cluster   true	master   Done    localhost   spoke-1
+76a0081a-e408-47c7-ac3a-4ad564d910b7   lab-cluster   true	worker   Done    localhost   spoke-4
+a72cbb4d-30d6-446b-805c-e4defdc07fc3   lab-cluster   true	master   Done    localhost   spoke-2
+</code></pre></div><p>Finally after the Stage done:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get nodes</span>
+NAME      STATUS   ROLES           AGE    VERSION
+spoke-1   Ready    master,worker   48m    v1.21.1+9807387
+spoke-2   Ready    master,worker   48m    v1.21.1+9807387
+spoke-3   Ready    master,worker   36m    v1.21.1+9807387
+spoke-4   Ready    worker          113s   v1.21.1+9807387
+</code></pre></div><p>and to verify the L3 remote worker node:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-zsh data-lang=zsh><span style=color:#f92672>[</span>root@qct-d14u11 ~<span style=color:#f92672>]</span><span style=color:#75715e># oc get nodes -owide</span>
+NAME      STATUS   ROLES           AGE     VERSION           INTERNAL-IP       EXTERNAL-IP   OS-IMAGE                                                       KERNEL-VERSION                 CONTAINER-RUNTIME
+spoke-1   Ready    master,worker   2d19h   v1.21.1+9807387   192.168.150.225   &lt;none&gt;        Red Hat Enterprise Linux CoreOS 48.84.202108210854-0 <span style=color:#f92672>(</span>Ootpa<span style=color:#f92672>)</span>   4.18.0-305.12.1.el8_4.x86_64   cri-o://1.21.2-13.rhaos4.8.git52b3f98.el8
+spoke-2   Ready    master,worker   2d19h   v1.21.1+9807387   192.168.150.226   &lt;none&gt;        Red Hat Enterprise Linux CoreOS 48.84.202108210854-0 <span style=color:#f92672>(</span>Ootpa<span style=color:#f92672>)</span>   4.18.0-305.12.1.el8_4.x86_64   cri-o://1.21.2-13.rhaos4.8.git52b3f98.el8
+spoke-3   Ready    master,worker   2d19h   v1.21.1+9807387   192.168.150.227   &lt;none&gt;        Red Hat Enterprise Linux CoreOS 48.84.202108210854-0 <span style=color:#f92672>(</span>Ootpa<span style=color:#f92672>)</span>   4.18.0-305.12.1.el8_4.x86_64   cri-o://1.21.2-13.rhaos4.8.git52b3f98.el8
+spoke-4   Ready    worker          2d18h   v1.21.1+9807387   192.168.122.8    &lt;none&gt;        Red Hat Enterprise Linux CoreOS 48.84.202108210854-0 <span style=color:#f92672>(</span>Ootpa<span style=color:#f92672>)</span>   4.18.0-305.12.1.el8_4.x86_64   cri-o://1.21.2-13.rhaos4.8.git52b3f98.el8
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/ title="Late Binding adding new agents"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Late Binding adding new agents</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/ title="RWN to Assisted Installer using AICLI API">Next - RWN to Assisted Installer using AICLI API <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

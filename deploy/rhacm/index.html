@@ -1,0 +1,248 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Red Hat Advanced Cluster Management (ACM) - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/rhacm/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Red Hat Advanced Cluster Management (ACM)">
+<meta property="og:description" content="References:   Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+  quay.io RHACM tags: https://quay.io/repository/acm-d/acm-custom-registry?tab=tags
+  quay.io RHACM bundle: https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags
+  official doc for deployment: https://github.com/open-cluster-management/deploy
+  The way to deploy: https://github.com/jparrill/ztp-the-hard-way
+  Requirements  Existing OCP cluster ready. Follow this instructions to get ready: https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md LocalStorage deployed on the OCP cluster. Follow these instructions to get deployed: https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md. Remember if you&rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of LS.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/rhacm/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Red Hat Advanced Cluster Management (ACM)">
+<meta name=twitter:description content="References:   Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+  quay.io RHACM tags: https://quay.io/repository/acm-d/acm-custom-registry?tab=tags
+  quay.io RHACM bundle: https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags
+  official doc for deployment: https://github.com/open-cluster-management/deploy
+  The way to deploy: https://github.com/jparrill/ztp-the-hard-way
+  Requirements  Existing OCP cluster ready. Follow this instructions to get ready: https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md LocalStorage deployed on the OCP cluster. Follow these instructions to get deployed: https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md. Remember if you&rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of LS.">
+<meta itemprop=name content="Red Hat Advanced Cluster Management (ACM)">
+<meta itemprop=description content="References:   Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+  quay.io RHACM tags: https://quay.io/repository/acm-d/acm-custom-registry?tab=tags
+  quay.io RHACM bundle: https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags
+  official doc for deployment: https://github.com/open-cluster-management/deploy
+  The way to deploy: https://github.com/jparrill/ztp-the-hard-way
+  Requirements  Existing OCP cluster ready. Follow this instructions to get ready: https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md LocalStorage deployed on the OCP cluster. Follow these instructions to get deployed: https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md. Remember if you&rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of LS.">
+<meta itemprop=wordCount content="507"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="ACM,labs,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Red Hat Advanced Cluster Management (ACM)</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#requirements>Requirements</a></li>
+</ul>
+<ul>
+<li><a href=#references-1>References</a></li>
+<li><a href=#connected-ipv4ipv6>Connected (ipv4/ipv6)</a></li>
+<li><a href=#disconnected-ipv4ipv6>Disconnected (ipv4/ipv6)</a>
+<ul>
+<li><a href=#mirror-step>Mirror step</a></li>
+<li><a href=#deploy-acm>Deploy ACM</a></li>
+</ul>
+</li>
+</ul>
+</nav></aside>
+<h1 id=references>References:</h1>
+<ul>
+<li>
+<p>Deploy Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm>https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm</a></p>
+</li>
+<li>
+<p><code>quay.io</code> RHACM tags: <a href="https://quay.io/repository/acm-d/acm-custom-registry?tab=tags">https://quay.io/repository/acm-d/acm-custom-registry?tab=tags</a></p>
+</li>
+<li>
+<p><code>quay.io</code> RHACM bundle: <a href="https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags">https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags</a></p>
+</li>
+<li>
+<p>official doc for deployment: <a href=https://github.com/open-cluster-management/deploy>https://github.com/open-cluster-management/deploy</a></p>
+</li>
+<li>
+<p>The way to deploy: <a href=https://github.com/jparrill/ztp-the-hard-way>https://github.com/jparrill/ztp-the-hard-way</a></p>
+</li>
+</ul>
+<h2 id=requirements>Requirements</h2>
+<ul>
+<li>Existing OCP cluster ready. Follow this instructions to get ready: <a href=https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md>https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md</a></li>
+<li><code>LocalStorage</code> deployed on the OCP cluster. Follow these instructions to get deployed: <a href=https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md>https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md</a>. Remember if you&rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of <code>LS</code>.</li>
+<li><code>/etc/host</code> entry in your local to get access to the multi-cloud website (<code>multicloud-console.apps.&lt; clustername >.&lt; domain ></code>):</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console>192.168.122.253 api.alb-test-ci.alklabs.com console-openshift-console.apps.alb-test-ci.alklabs.com oauth-openshift.apps.alb-test-ci.alklabs.com prometheus-k8s-openshift-monitoring.apps.alb-test-ci.alklabs.com ocp-metal-ui-assisted-installer.apps.alb-test-ci.alklabs.com  assisted-service-assisted-installer.apps.alb-test-ci.alklabs.com multicloud-console.apps.alb-test-ci.alklabs.com
+</code></pre></div><h1 id=install-the-rhacm-upstream-only-connected>Install the RHACM upstream (only connected)</h1>
+<p>This is the official way to deploy the release upstream. Pretty simple, just creating the next manifests:</p>
+<p>First thing is to create the namespace with <code>oc apply -f 01-rhacm-ns.yml</code></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Namespace</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>openshift.io/cluster-monitoring</span>: <span style=color:#e6db74>&#34;true&#34;</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>open-cluster-management</span>
+</code></pre></div><p>Then you should create the operator group with <code>oc apply -f 02-operatorGroup.yml</code></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>OperatorGroup</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>advanced-cluster-management-operatorgroup</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>targetNamespaces</span>:
+    - <span style=color:#ae81ff>open-cluster-management</span>
+</code></pre></div><p>Next thing is the subscription. Here, we have to define the channel with the correct release we&rsquo;re gonna deploy and the source where the release could be found:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Subscription</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>advanced-cluster-management-subscription</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>channel</span>: <span style=color:#e6db74>&#34;release-2.2&#34;</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>advanced-cluster-management</span>
+  <span style=color:#f92672>source</span>: <span style=color:#ae81ff>redhat-operators</span>
+  <span style=color:#f92672>sourceNamespace</span>: <span style=color:#ae81ff>openshift-marketplace</span>
+</code></pre></div><p>Now you should wait a little until all the basic resources have been created in order to continue with the CR <code>MultiClusterHub</code> with <code>oc apply -f 05-multiclousterhub-cr.yml</code>:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operator.open-cluster-management.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>MultiClusterHub</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>multiclusterhub</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>open-cluster-management</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>imagePullSecret</span>: <span style=color:#e6db74>&#34;&#34;</span>
+</code></pre></div><p>At this point we&rsquo;ve to wait until all the resources have been created. It can take up to 10 minutes for the <code>MultiClusterHub</code></p>
+<p>You could verify using <code>../shared-utils/wait_for_acm.sh</code> or maybe doing a basic check:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>oc get mch -o<span style=color:#f92672>=</span>jsonpath<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;{.items[0].status.phase}&#39;</span>
+</code></pre></div><p>Moreover, you should verify that the routes are available to access through the web console:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>oc get routes
+</code></pre></div><h1 id=deploy-rhacm-downstream-connecteddisconnected>Deploy RHACM downstream (connected/disconnected)</h1>
+<h2 id=references-1>References</h2>
+<ul>
+<li><code>quay.io</code> RHACM tags: <a href="https://quay.io/repository/acm-d/acm-custom-registry?tab=tags">https://quay.io/repository/acm-d/acm-custom-registry?tab=tags</a></li>
+<li><code>quay.io</code> RHACM bundle: <a href="https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags">https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags</a></li>
+<li>official doc for deployment: <a href=https://github.com/open-cluster-management/deploy>https://github.com/open-cluster-management/deploy</a></li>
+<li>The way to deploy: <a href=https://github.com/jparrill/ztp-the-hard-way>https://github.com/jparrill/ztp-the-hard-way</a></li>
+</ul>
+<h2 id=connected-ipv4ipv6>Connected (ipv4/ipv6)</h2>
+<p>The next section explains the procedure to do the deployment of ACM for a connected environment. In the <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm>deploy folder</a> all scripts are prepared for install both ipv4 and ipv6, depending on the environment variable. For instance, to deploy a connected, this step corresponds with this <a href=https://github.com/RHsyseng/labs-index/blob/master/deploy-rhacm/deploy.sh>deploy.sh script</a> inside the folder mentioned before.</p>
+<p>The doc to deploy with a connected environment is:</p>
+<ul>
+<li><a href=https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/connected-ZTP-flow-hub-deployment.md>https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/connected-ZTP-flow-hub-deployment.md</a></li>
+</ul>
+<h2 id=disconnected-ipv4ipv6>Disconnected (ipv4/ipv6)</h2>
+<p>The next section explains the procedure to do the mirror and the deployment of ACM for a disconnected environment. Inside the <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm>deploy folder</a> all scripts are prepared for install both ipv4 and ipv6, connected/disconnected, depending on the environment variable.</p>
+<h3 id=mirror-step>Mirror step</h3>
+<p>Inside the <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm>deploy folder</a> mentioned before, there&rsquo;s a <a href=https://github.com/RHsyseng/labs-index/blob/master/deploy-rhacm/mirror.sh>mirror.sh script</a> which basically do the next procedure.</p>
+<p>Remember you&rsquo;re using a disconnected environment, so you must use these instructions to mirror the ACM software into your internal registry, before starting with the procedure:</p>
+<ul>
+<li><a href=https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/prerequirements/acm-downstream-deployment.md>https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/prerequirements/acm-downstream-deployment.md</a></li>
+</ul>
+<h3 id=deploy-acm>Deploy ACM</h3>
+<p>Inside de <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm>deploy folder</a> mentioned before, there&rsquo;s an <a href=https://github.com/RHsyseng/labs-index/blob/master/deploy-rhacm/deploy.sh>deploy.sh script</a> to deploy ACM which basically do the next procedure.</p>
+<p>The doc to deploy with a disconnected environment is:</p>
+<ul>
+<li><a href=https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/disconnected-ZTP-flow-hub-deployment.md>https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/disconnected-ZTP-flow-hub-deployment.md</a></li>
+</ul>
+<div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/ title="Physical IPv6 Disconnected Lab"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Physical IPv6 Disconnected Lab</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/ title="ZTP The Hard Way">Next - ZTP The Hard Way <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

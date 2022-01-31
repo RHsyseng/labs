@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Operator on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/deploy/operator/</link>
+    <description>Recent content in Operator on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/deploy/operator/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>LocalStorage</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/localstorage/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/localstorage/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator
+Deploy 5 disks for each nodes # kcli create disk -s 10 qct11-master-x ---scripted for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done Create the local storage operator  namespace operator group subscription  1-. Namespace: To do that just oc apply -f 01-LS-namespace.yml:
+--- apiVersion: v1 kind: Namespace metadata: name: openshift-local-storage 2-. Operator group:</description>
+    </item>
+    
+    <item>
+      <title>Hive</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/hive/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/hive/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hive-operator
+Hive Operator --- apiVersion: operators.coreos.com/v1 kind: OperatorGroup metadata: name: global-operators namespace: openshift-operators spec: targetNamespaces: - openshift-operators --- apiVersion: operators.coreos.com/v1alpha1 kind: Subscription metadata: name: hive-operator namespace: openshift-operators spec: channel: alpha installPlanApproval: Automatic name: hive-operator source: community-operators sourceNamespace: openshift-marketplace startingCSV: hive-operator.v1.1.2 </description>
+    </item>
+    
+    <item>
+      <title>Assisted Installer</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/</guid>
+      <description>Reference  Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator External Operator ref: https://github.com/openshift/assisted-service quay.io reference tag: https://quay.io/repository/ocpmetal/assisted-service-index?tab=tags  Assisted Installer Operator Catalog Source First thing is to create the catalog source with the quay image from the Development team.
+The only thing we need to change is the tag for the image using the reference url
+--- apiVersion: operators.coreos.com/v1alpha1 kind: CatalogSource metadata: name: assisted-service namespace: openshift-marketplace spec: image: quay.io/ocpmetal/assisted-service-index:&amp;lt;tag from quay.io&amp;gt; sourceType: grpc  In case you want to go with the version of the Operator Hub, in the extra folder you&amp;rsquo;ve got the file assisted-installer-CS-operatorHub.</description>
+    </item>
+    
+  </channel>
+</rss>

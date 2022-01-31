@@ -1,0 +1,213 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>LocalStorage - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="LocalStorage">
+<meta property="og:description" content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator
+Deploy 5 disks for each nodes # kcli create disk -s 10 qct11-master-x ---scripted for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done Create the local storage operator  namespace operator group subscription  1-. Namespace: To do that just oc apply -f 01-LS-namespace.yml:
+--- apiVersion: v1 kind: Namespace metadata: name: openshift-local-storage 2-. Operator group:">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/operator/localstorage/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="LocalStorage">
+<meta name=twitter:description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator
+Deploy 5 disks for each nodes # kcli create disk -s 10 qct11-master-x ---scripted for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done Create the local storage operator  namespace operator group subscription  1-. Namespace: To do that just oc apply -f 01-LS-namespace.yml:
+--- apiVersion: v1 kind: Namespace metadata: name: openshift-local-storage 2-. Operator group:">
+<meta itemprop=name content="LocalStorage">
+<meta itemprop=description content="Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator
+Deploy 5 disks for each nodes # kcli create disk -s 10 qct11-master-x ---scripted for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done Create the local storage operator  namespace operator group subscription  1-. Namespace: To do that just oc apply -f 01-LS-namespace.yml:
+--- apiVersion: v1 kind: Namespace metadata: name: openshift-local-storage 2-. Operator group:">
+<meta itemprop=wordCount content="182"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="Operator,LocalStorage,labs,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>LocalStorage</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#reference>Reference</a></li>
+</ul>
+<ul>
+<li><a href=#create-the-local-storage-operator>Create the local storage operator</a></li>
+</ul>
+</nav></aside>
+<h2 id=reference>Reference</h2>
+<p>Deploy Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator>https://github.com/RHsyseng/labs-index/tree/master/deploy-LocalStorage-operator</a></p>
+<h1 id=deploy-5-disks-for-each-nodes>Deploy 5 disks for each nodes</h1>
+<pre tabindex=0><code class=language-commandline data-lang=commandline>
+
+# kcli create disk -s 10 qct11-master-x
+
+---scripted
+
+for node in `seq 0 2`; do for a in `seq 0 5`; do kcli create disk -s 10 qct11-master-$node; done; done
+
+</code></pre><h2 id=create-the-local-storage-operator>Create the local storage operator</h2>
+<ul>
+<li>namespace</li>
+<li>operator group</li>
+<li>subscription</li>
+</ul>
+<p>1-. Namespace: To do that just <code>oc apply -f 01-LS-namespace.yml</code>:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Namespace</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>openshift-local-storage</span>
+</code></pre></div><p>2-. Operator group:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha2</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>OperatorGroup</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>local-operator-group</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>openshift-local-storage</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>targetNamespaces</span>:
+    - <span style=color:#ae81ff>openshift-local-storage</span>
+</code></pre></div><p>3-. Catalog source:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CatalogSource</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>localstorage-operator-manifests</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>openshift-local-storage</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>sourceType</span>: <span style=color:#ae81ff>grpc</span>
+  <span style=color:#f92672>image</span>: <span style=color:#ae81ff>quay.io/gnufied/gnufied-index:1.0.0</span>
+</code></pre></div><p>4-. Subscription:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Subscription</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>local-storage-subscription</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>openshift-local-storage</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>channel</span>: <span style=color:#ae81ff>preview</span> <span style=color:#75715e># this is the default channel name defined in opm-bundle file</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>local-storage-operator</span>
+  <span style=color:#f92672>source</span>: <span style=color:#ae81ff>localstorage-operator-manifests</span>
+  <span style=color:#f92672>sourceNamespace</span>: <span style=color:#ae81ff>openshift-local-storage</span>
+</code></pre></div><p>5-. Local Volume:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>local.storage.openshift.io/v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>LocalVolume</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>fs</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>openshift-local-storage</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>logLevel</span>: <span style=color:#ae81ff>Normal</span>
+  <span style=color:#f92672>managementState</span>: <span style=color:#ae81ff>Managed</span>
+  <span style=color:#f92672>storageClassDevices</span>:
+    - <span style=color:#f92672>devicePaths</span>:
+        - <span style=color:#ae81ff>/dev/vdc</span>
+        - <span style=color:#ae81ff>/dev/vdd</span>
+        - <span style=color:#ae81ff>/dev/vde</span>
+        - <span style=color:#ae81ff>/dev/vdf</span>
+        - <span style=color:#ae81ff>/dev/vdg</span>
+      <span style=color:#f92672>fsType</span>: <span style=color:#ae81ff>ext4</span>
+      <span style=color:#f92672>storageClassName</span>: <span style=color:#ae81ff>fs-lso</span>
+      <span style=color:#f92672>volumeMode</span>: <span style=color:#ae81ff>Filesystem</span>
+</code></pre></div><p>6-. Patch the <code>LocalStorage</code> Kubernetes:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>kubectl patch storageclass fs-lso -p <span style=color:#e6db74>&#39;{&#34;metadata&#34;: {&#34;annotations&#34;:{&#34;storageclass.kubernetes.io/is-default-class&#34;:&#34;true&#34;}}}&#39;</span>
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/operator/ title=Operator><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Operator</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/operator/hive/ title=Hive>Next - Hive <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>physical on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/physical/</link>
+    <description>Recent content in physical on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/physical/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Physical IPv6 Disconnected Lab</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/</guid>
+      <description>In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.
+Hosts hostname: bm-cluster-1-hyper.e2e.bos.redhat.com
+&amp;nbsp;danger Must use kni user instead of root, so su - kni   References Lab Folder: N/A (There isn&amp;rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)
+Lab info https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md</description>
+    </item>
+    
+    <item>
+      <title>ZTP The Hard Way</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/</guid>
+      <description>References: ZTP For Telco Edge 5G  What is ZTP? Context on ZTP architecture  Disconnected ZTP Flow Connected ZTP Flow ZTP Hub Components   How to start with ZTP?    References:  The original repository: https://github.com/jparrill/ztp-the-hard-way  ZTP For Telco Edge 5G Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&amp;rsquo;s get started from the beginning with some context and theory.</description>
+    </item>
+    
+  </channel>
+</rss>

@@ -1,0 +1,335 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts">
+<meta property="og:description" content="References Lab-index branch: sno-acm-stark
+https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal
+https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+Previous Requirements  Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster. This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.  ACM Installation Using the next script to install the ACM on the Single Node Cluster:">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts">
+<meta name=twitter:description content="References Lab-index branch: sno-acm-stark
+https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal
+https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+Previous Requirements  Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster. This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.  ACM Installation Using the next script to install the ACM on the Single Node Cluster:">
+<meta itemprop=name content="Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts">
+<meta itemprop=description content="References Lab-index branch: sno-acm-stark
+https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal
+https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+Previous Requirements  Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster. This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.  ACM Installation Using the next script to install the ACM on the Single Node Cluster:">
+<meta itemprop=wordCount content="839"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="ACM,sno,scripts,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#references>References</a></li>
+<li><a href=#previous-requirements>Previous Requirements</a></li>
+<li><a href=#acm-installation>ACM Installation</a>
+<ul>
+<li><a href=#start-prereqsh-script-to-launch-the-real-acm-installation>start-prereq.sh script to launch the real ACM installation</a></li>
+</ul>
+</li>
+<li><a href=#create-a-single-node-spoke-cluster-on-top-of-the-acm-single-node-cluster>Create a Single Node Spoke Cluster on top of the ACM Single Node Cluster</a>
+<ul>
+<li><a href=#script-to-create-a-vm>Script to create a VM</a></li>
+</ul>
+</li>
+</ul>
+</nav></aside>
+<h2 id=references>References</h2>
+<p>Lab-index branch: sno-acm-stark</p>
+<p><a href=https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal>https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal</a></p>
+<p><a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm>https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm</a></p>
+<h2 id=previous-requirements>Previous Requirements</h2>
+<ul>
+<li>Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster.
+This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.</li>
+</ul>
+<h2 id=acm-installation>ACM Installation</h2>
+<p>Using the next script to install the ACM on the Single Node Cluster:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e>#!/usr/bin/env bash
+</span><span style=color:#75715e></span>
+set -o errexit
+set -o pipefail
+set -o nounset
+set -m
+
+<span style=color:#75715e># variables</span>
+<span style=color:#75715e># #########</span>
+export OC_CLUSTER_NAME<span style=color:#f92672>=</span>test-ci
+export OC_SNAPSHOT<span style=color:#f92672>=</span>2.3.0-DOWNSTREAM-XXXXXXXXX <span style=color:#75715e># replace with the snapshot you want to use </span>
+export OC_BUNDLE<span style=color:#f92672>=</span>v2.3.0-117 <span style=color:#75715e># replace with the bundle you want to use</span>
+export HOST_INSTALLER<span style=color:#f92672>=</span>$host_installer  <span style=color:#75715e># vm or host with the registry mirror if needed, dhcp and dns, </span>
+export IP_INSTALLER<span style=color:#f92672>=</span>$ip_installer      <span style=color:#75715e># ip address for the installer host</span>
+export SHARE_DIR<span style=color:#f92672>=</span>$shared_dir           <span style=color:#75715e># lab-index/shared_folder</span>
+export OC_AMORGANT_QUAY<span style=color:#f92672>=</span>               <span style=color:#75715e># pull secret for quay  </span>
+export OC_TYPE_ENV<span style=color:#f92672>=</span>connected           <span style=color:#75715e># type of environment</span>
+export OC_NET_CLASS<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;ipv4&#34;</span>             <span style=color:#75715e># network class</span>
+
+
+source ../$SHARED_DIR/inventory.sh
+export KUBECONFIG<span style=color:#f92672>=</span>~/.kcli/clusters/$OC_CLUSTER_NAME/auth/kubeconfig
+
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt; Set the ip format depending on ipv4 / ipv6&#34;</span>
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#34;</span>
+export ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span>
+<span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$OC_NET_CLASS<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ipv4&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+    ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span>$IP_INSTALLER<span style=color:#e6db74>&#34;</span>
+<span style=color:#66d9ef>else</span>
+    ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;[</span>$IP_INSTALLER<span style=color:#e6db74>]&#34;</span>
+<span style=color:#66d9ef>fi</span>
+
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt; Copy files to installer node&#34;</span>
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#34;</span>
+scp ./start-prereq.sh root@<span style=color:#e6db74>&#34;</span>$ip<span style=color:#e6db74>&#34;</span>:~/
+scp ./pull-secret.yaml root@<span style=color:#e6db74>&#34;</span>$ip<span style=color:#e6db74>&#34;</span>:~/
+scp ./00-icsp-base.yml root@<span style=color:#e6db74>&#34;</span>$ip<span style=color:#e6db74>&#34;</span>:~/
+
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt; Execute the start script in the installer node&#34;</span>
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#34;</span>
+ssh root@<span style=color:#e6db74>&#34;</span>$IP_INSTALLER<span style=color:#e6db74>&#34;</span> -x <span style=color:#e6db74>&#34;/root/start-prereq.sh </span>$OC_SNAPSHOT<span style=color:#e6db74> </span>$OC_AMORGANT_QUAY<span style=color:#e6db74> </span>$OC_TYPE_ENV<span style=color:#e6db74>&#34;</span>
+</code></pre></div><ul>
+<li>
+<p>The content to inventory.sh is basically the information about nodes and ip addresses. <code>$host_installer</code> and the <code>$ip_installer</code> are set in this script. Just to be clear is just an inventory file with the information about the nodes and ip addresses.</p>
+</li>
+<li>
+<p>The installer vm/node is the node to use the registry in case you need disconnected environment.</p>
+</li>
+<li>
+<p>Net class availables: ipv4 or ipv6</p>
+</li>
+<li>
+<p>The <code>$OC_AMORGANT_QUAY</code> is the pull secret for the development repo acm in quay.io. Required for development acm-d</p>
+</li>
+<li>
+<p>The next step is copy the files to the installer node, due to the registry mirror, the installer node is not the same as the node where the ACM is installed. In my case, I copy there in order to have the same information and the registry in the same place. Totally optional for different environments or workflows.</p>
+</li>
+</ul>
+<h3 id=start-prereqsh-script-to-launch-the-real-acm-installation>start-prereq.sh script to launch the real ACM installation</h3>
+<p>This is the previous step to launch the acm installation, in order to have all the requirements for the start.sh script ready.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e>#!/usr/bin/env bash
+</span><span style=color:#75715e></span>
+git clone https://github.com/open-cluster-management/deploy.git
+mv /root/pull-secret.yaml /root/deploy/prereqs/
+cd deploy
+echo $1 &gt;snapshot.ver
+sed -i <span style=color:#e6db74>&#34;s/CHANGE_ME/</span>$2<span style=color:#e6db74>/g&#34;</span> prereqs/pull-secret.yaml
+
+export DEBUG<span style=color:#f92672>=</span>true
+export DEFAULT_SNAPSHOT<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span>$1<span style=color:#e6db74>&#34;</span>
+export KUBECONFIG<span style=color:#f92672>=</span>/root/ocp/auth/kubeconfig
+export COMPOSITE_BUNDLE<span style=color:#f92672>=</span>true
+
+<span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$3<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#34;disconnected&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+  export CUSTOM_REGISTRY_REPO<span style=color:#f92672>=</span>test-ci-installer.alklabs.com:5000/rhacm2
+<span style=color:#66d9ef>else</span>
+  oc apply -f /root/00-icsp-base.yml
+  export CUSTOM_REGISTRY_REPO<span style=color:#f92672>=</span>quay.io:443/acm-d
+<span style=color:#66d9ef>fi</span>
+
+
+./start.sh --watch --silent
+
+</code></pre></div><p>After that the script start.sh is launched.</p>
+<h2 id=create-a-single-node-spoke-cluster-on-top-of-the-acm-single-node-cluster>Create a Single Node Spoke Cluster on top of the ACM Single Node Cluster</h2>
+<p>After the ACM installation, the next step is to create a Single Node Spoke Cluster on top of the ACM Single Node Cluster. To do that you could use this script:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#75715e>#!/usr/bin/env bash
+</span><span style=color:#75715e></span>
+set -o errexit
+set -o pipefail
+set -o nounset
+set -m
+
+<span style=color:#75715e># variables</span>
+<span style=color:#75715e># #########</span>
+export OC_CLUSTER_NAME<span style=color:#f92672>=</span>test-ci
+export IP_INSTALLER<span style=color:#f92672>=</span>$ip_installer  <span style=color:#75715e># this is the IP with sushy tools installed for virtual deployment</span>
+export OC_NET_CLASS<span style=color:#f92672>=</span>ipv6           <span style=color:#75715e># network class</span>
+export OC_SPOKE_NAME<span style=color:#f92672>=</span>spoke-1       <span style=color:#75715e># name of the spoke cluster</span>
+export OC_MASTER_SPOKE<span style=color:#f92672>=</span><span style=color:#ae81ff>3</span>           <span style=color:#75715e># number of master nodes for the hub cluster</span>
+export SHARED_DIR<span style=color:#f92672>=</span>shared-utils     <span style=color:#75715e># lab-index/shared_folder</span>
+source ../$SHARED_DIR/inventory.sh <span style=color:#75715e># inventory of ip addresses file</span>
+export KUBECONFIG<span style=color:#f92672>=</span>~/.kcli/clusters/$OC_CLUSTER_NAME/auth/kubeconfig
+export ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;&#34;</span>
+
+<span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$OC_MASTER_SPOKE<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>==</span> <span style=color:#e6db74>&#39;3&#39;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$OC_NET_CLASS<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ipv4&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+        ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span>$IP_INSTALLER<span style=color:#e6db74>&#34;</span>
+        . ./04-create-new-vm.sh     <span style=color:#75715e># this script will be shown in the next section</span>
+    <span style=color:#66d9ef>else</span>
+        ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;[</span>$IP_INSTALLER<span style=color:#e6db74>]&#34;</span>
+        . ./04-create-new-vm-ipv6.sh <span style=color:#75715e># this script will be shown in the next section</span>
+    <span style=color:#66d9ef>fi</span>
+    oc patch provisioning provisioning-configuration --type merge -p <span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;watchAllNamespaces&#34;: true}}&#39;</span>
+    sed -i <span style=color:#e6db74>&#34;s/INSTALLER_IP/</span>$ip<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT1/</span>$agent1<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml    <span style=color:#75715e>#rename the uuid of the agent (in this case VM uuid)</span>
+    sed -i <span style=color:#e6db74>&#34;s/AGENT2/</span>$agent2<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT3/</span>$agent3<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME/</span>$OC_SPOKE_NAME<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME1/</span>$OC_SPOKE_NAME<span style=color:#e6db74>-1/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME2/</span>$OC_SPOKE_NAME<span style=color:#e6db74>-2/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME3/</span>$OC_SPOKE_NAME<span style=color:#e6db74>-3/g&#34;</span> 05-BMhost-multinode.yml
+
+    oc apply -f 05-BMhost-multinode.yml
+<span style=color:#66d9ef>else</span> <span style=color:#75715e># sno</span>
+    <span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$OC_NET_CLASS<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#34;ipv4&#34;</span> <span style=color:#f92672>]</span>; <span style=color:#66d9ef>then</span>
+        ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;</span>$IP_INSTALLER<span style=color:#e6db74>&#34;</span>
+        . ./04-create-new-vm-sno.sh
+    <span style=color:#66d9ef>else</span>
+        ip<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;[</span>$IP_INSTALLER<span style=color:#e6db74>]&#34;</span>
+        . ./04-create-new-vm-sno-ipv6.sh
+    <span style=color:#66d9ef>fi</span>
+    oc patch provisioning provisioning-configuration --type merge -p <span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;watchAllNamespaces&#34;: true}}&#39;</span>
+    sed -i <span style=color:#e6db74>&#34;s/INSTALLER_IP/</span>$ip<span style=color:#e6db74>/g&#34;</span> 99-BMhost-sno.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT1/</span>$agent1<span style=color:#e6db74>/g&#34;</span> 99-BMhost-sno.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME/</span>$OC_SPOKE_NAME<span style=color:#e6db74>/g&#34;</span> 99-BMhost-sno.yml
+    oc apply -f 99-BMhost-sno.yml
+<span style=color:#66d9ef>fi</span>
+
+</code></pre></div><h3 id=script-to-create-a-vm>Script to create a VM</h3>
+<p>This is just an example using kcli to interact with libvirtd, but you could use any other tool to create a VM.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>kcli create vm -P uefi_legacy<span style=color:#f92672>=</span>true -P start<span style=color:#f92672>=</span>false -P nets<span style=color:#f92672>=[</span><span style=color:#e6db74>&#39;{&#34;name&#34;:&#34;bare-net&#34;, &#34;mac&#34;:&#34;ee:bb:aa:ee:1e:1a&#34;}&#39;</span><span style=color:#f92672>]</span> -P memory<span style=color:#f92672>=</span><span style=color:#ae81ff>38000</span> -P numcpus<span style=color:#f92672>=</span><span style=color:#ae81ff>8</span> -P disks<span style=color:#f92672>=[</span>280<span style=color:#f92672>]</span> agent1
+export agent1<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>kcli info vm -v -f id agent1<span style=color:#66d9ef>)</span>
+</code></pre></div><p>The next thing is to create the Baremetal host using this yaml manifest:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>bmc-secret1</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>password</span>: <span style=color:#ae81ff>YWxrbm9wZmxlcgo=</span>
+  <span style=color:#f92672>username</span>: <span style=color:#ae81ff>YW1vcmdhbnQK</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Opaque</span>
+
+
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>metal3.io/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>BareMetalHost</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-agent1</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>infraenvs.agent-install.openshift.io</span>: <span style=color:#e6db74>&#34;lab-env&#34;</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>inspect.metal3.io</span>: <span style=color:#ae81ff>disabled</span>
+    <span style=color:#f92672>bmac.agent-install.openshift.io/hostname</span>: <span style=color:#e6db74>&#34;OC_SPOKE_NAME&#34;</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>online</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bmc</span>:
+    <span style=color:#f92672>address</span>: <span style=color:#ae81ff>redfish-virtualmedia+http://INSTALLER_IP:8000/redfish/v1/Systems/AGENT1</span>
+    <span style=color:#f92672>credentialsName</span>: <span style=color:#ae81ff>bmc-secret1</span>
+    <span style=color:#f92672>disableCertificateVerification</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bootMACAddress</span>: <span style=color:#ae81ff>ee:bb:aa:ee:1e:1a</span>
+  <span style=color:#f92672>automatedCleaningMode</span>: <span style=color:#ae81ff>disabled</span>
+</code></pre></div><p>so, with the script as you can imagine we&rsquo;re replacing some of the variables in the yaml file and using the variables to create the VM.</p>
+<div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/ title="RWN to Assisted Installer using AICLI API"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - RWN to Assisted Installer using AICLI API</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/ title="Physical IPv6 Disconnected Lab">Next - Physical IPv6 Disconnected Lab <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

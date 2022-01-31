@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Labs to install an OpenShift cluster on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/ocp/</link>
+    <description>Recent content in Labs to install an OpenShift cluster on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/ocp/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Pull Secret Validator tool</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/</guid>
+      <description>Disclaimer &amp;nbsp;UNSUPPORTED This repository and its contents are completely UNSUPPORTED in any way and are not part of official documentation.   &amp;nbsp;Contribute! The documents hosted here are just personal notes, if you feel that you can contribute into polishing them as guides, feel free to let us know via issues to this repository:
+https://gihub.com/RHsyseng/labs
+  Description This is a go library created to validate a pull-secret, keeping in mind the next concepts:</description>
+    </item>
+    
+  </channel>
+</rss>

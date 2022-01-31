@@ -1,0 +1,584 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Physical IPv6 Disconnected Lab - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Physical IPv6 Disconnected Lab">
+<meta property="og:description" content="In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.
+Hosts hostname: bm-cluster-1-hyper.e2e.bos.redhat.com
+&nbsp;danger Must use kni user instead of root, so su - kni   References Lab Folder: N/A (There isn&rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)
+Lab info https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Physical IPv6 Disconnected Lab">
+<meta name=twitter:description content="In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.
+Hosts hostname: bm-cluster-1-hyper.e2e.bos.redhat.com
+&nbsp;danger Must use kni user instead of root, so su - kni   References Lab Folder: N/A (There isn&rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)
+Lab info https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md">
+<meta itemprop=name content="Physical IPv6 Disconnected Lab">
+<meta itemprop=description content="In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.
+Hosts hostname: bm-cluster-1-hyper.e2e.bos.redhat.com
+&nbsp;danger Must use kni user instead of root, so su - kni   References Lab Folder: N/A (There isn&rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)
+Lab info https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md">
+<meta itemprop=wordCount content="1758"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="baremetal,labs,IPv6,disconnected,physical,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Physical IPv6 Disconnected Lab</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#hosts>Hosts</a></li>
+<li><a href=#references>References</a></li>
+<li><a href=#architecture-and-description>Architecture and description</a></li>
+<li><a href=#clusters-configuration>Clusters Configuration</a></li>
+<li><a href=#helper-node>Helper node</a>
+<ul>
+<li><a href=#ra-service-is-running>RA service is running</a></li>
+<li><a href=#registry-service>Registry Service:</a></li>
+<li><a href=#dnsmasq><code>dnsmasq</code></a></li>
+<li><a href=#haproxy>HAProxy</a></li>
+</ul>
+</li>
+<li><a href=#deploy-ocp-ipi-from-scratch-disconnected>Deploy OCP IPI from scratch (disconnected)</a></li>
+<li><a href=#pull-secret>Pull secret</a></li>
+<li><a href=#kubeconfig>KUBECONFIG</a></li>
+<li><a href=#mirroring-ocp-release>Mirroring OCP release</a></li>
+<li><a href=#deploy-ocp-mirrored-before>Deploy OCP mirrored before</a></li>
+<li><a href=#iscsi>iSCSI</a>
+<ul>
+<li><a href=#description>Description</a></li>
+<li><a href=#how-to-use-iscsi-to-deploy-disks-for-an-operator>how to use iSCSI to deploy disks for an operator</a></li>
+</ul>
+</li>
+<li><a href=#apply-icsp>Apply ICSP</a></li>
+<li><a href=#mirror-from-olm>Mirror from OLM</a></li>
+</ul>
+</nav></aside>
+<p>In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.</p>
+<h2 id=hosts>Hosts</h2>
+<p><code>hostname</code>: <code>bm-cluster-1-hyper.e2e.bos.redhat.com</code></p>
+<div class="panel panel-warning"><div class=panel-header>
+<h3><i class="fas fa-exclamation-triangle"></i>&nbsp;danger</h3>
+</div><div class=panel-body>
+Must use <code>kni</code> user instead of <code>root</code>, so <code>su - kni</code>
+</div>
+</div>
+<h2 id=references>References</h2>
+<p>Lab Folder: N/A (There isn&rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)</p>
+<p>Lab info
+<a href=https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md>https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md</a></p>
+<p>OLM operator info:
+<a href=https://linuxera.org/integrating-operators-olm/>https://linuxera.org/integrating-operators-olm/</a>
+<a href=https://github.com/operator-framework/operator-registry/blob/v1.12.6/docs/design/operator-bundle.md>https://github.com/operator-framework/operator-registry/blob/v1.12.6/docs/design/operator-bundle.md</a></p>
+<h2 id=architecture-and-description>Architecture and description</h2>
+<p><a href=https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md>https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md</a></p>
+<p><img src=img/IPv6_Disconn_Lab.png alt="Disconnected lab schematics"></p>
+<h2 id=clusters-configuration>Clusters Configuration</h2>
+<ul>
+<li>1 Helper node acting as DNS/DHCP/Registry for all clusters, it&rsquo;s reachable over IPv6</li>
+<li>All nodes have two NICs configured:
+<ul>
+<li>1 NIC - 10GB for Provision traffic (eno1)
+<ul>
+<li>A bridge named <code>Provisioning</code> is configured in the OS</li>
+<li>We do VLAN Tagging (id 3790 and 3791) in the OS, this NIC is connected to a switch port configured as hybrid mode</li>
+</ul>
+</li>
+<li>1 NIC - 1GB for Baremetal traffic (enp3s0f0)
+<ul>
+<li>A bridge named <code>Baremetal</code> is configured in the OS</li>
+<li>We do VLAN Tagging (id 152 and 153) in the OS, this NIC is connected to a switch port configured as hybrid mode</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Hub Cluster:
+<ul>
+<li>3 Masters:
+<ul>
+<li><code>$BASE_DOMAIN</code>: <code>mgmt-hub.e2e.bos.redhat.com</code></li>
+<li><code>DHCP Range</code>: <code>2620:52:0:1302::11,2620:52:0:1302::20,64</code></li>
+<li><code>ingressVIP</code>: <code>apps.$BASE_DOMAIN: 2620:52:0:1302::2</code></li>
+<li><code>apiVIP</code>: <code>api.$BASE_DOMAIN: 2620:52:0:1302::3</code></li>
+<li><code>dnsVIP</code>: <code>ns1.$BASE_DOMAIN: 2620:52:0:1302::4</code></li>
+<li><code>master0</code>: <code>openshift-master-0.$BASE_DOMAIN 2620:52:0:1302::5</code></li>
+<li><code>master1</code>: <code>openshift-master-1.$BASE_DOMAIN 2620:52:0:1302::6</code></li>
+<li><code>master2</code>: <code>openshift-master-2.$BASE_DOMAIN 2620:52:0:1302::7</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Spoke1:
+<ul>
+<li>3 Masters:
+<ul>
+<li><code>$BASE_DOMAIN</code> :<code>mgmt-spoke1.e2e.bos.redhat.com</code></li>
+<li><code>DHCP Range</code> :<code>2620:52:0:1303::11,2620:52:0:1303::20,64</code></li>
+<li><code>ingressVIP</code> :<code>apps.$BASE_DOMAIN: 2620:52:0:1303::2</code></li>
+<li><code>apiVIP</code> :<code>api.$BASE_DOMAIN: 2620:52:0:1303::3</code></li>
+<li><code>dnsVIP</code> :<code>ns1.$BASE_DOMAIN: 2620:52:0:1303::4</code></li>
+<li><code>master0</code> :<code>openshift-master-0.$BASE_DOMAIN 2620:52:0:1303::5</code></li>
+<li><code>master1</code> :<code>openshift-master-0.$BASE_DOMAIN 2620:52:0:1303::6</code></li>
+<li><code>master2</code> :<code>openshift-master-0.$BASE_DOMAIN 2620:52:0:1303::7</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>Spoke2:
+<ul>
+<li>3 Masters:
+<ul>
+<li><code>$BASE_DOMAIN</code>: <code>mgmt-spoke2.e2e.bos.redhat.com</code></li>
+<li><code>DHCP Range</code>:<code> 2620:52:0:1304::11,2620:52:0:1304::20,64</code></li>
+<li><code>ingressVIP</code>:<code> apps.$BASE_DOMAIN: 2620:52:0:1304::2</code></li>
+<li><code>apiVIP</code> :<code>api.$BASE_DOMAIN: 2620:52:0:1304::3</code></li>
+<li><code>dnsVIP</code>: <code>ns1.$BASE_DOMAIN: 2620:52:0:1304::4</code></li>
+<li><code>master0</code>: <code>openshift-master-0.$BASE_DOMAIN 2620:52:0:1304::5</code></li>
+<li><code>master1</code>: <code>openshift-master-1.$BASE_DOMAIN 2620:52:0:1304::6</code></li>
+<li><code>master2</code>: <code>openshift-master-2.$BASE_DOMAIN 2620:52:0:1304::7</code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p>Basically:</p>
+<ul>
+<li>Provisioning network -> Ironic DHCP + DNS</li>
+<li>Baremetal -> disconnected IPv6</li>
+</ul>
+<h2 id=helper-node>Helper node</h2>
+<p>The helper node is acting as DNS/DHCP/REGISTRY as well as IPv6 route advertisement. To access the console from external sites, because of IPv6, it is needed to use HAProxy for translating the IPv4 <code>endpoints</code> to the back-end using IPv6.</p>
+<h3 id=ra-service-is-running>RA service is running</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ~<span style=color:#f92672>]</span>$ systemctl status radvd
+● radvd.service - Router advertisement daemon <span style=color:#66d9ef>for</span> IPv6
+Loaded: loaded <span style=color:#f92672>(</span>/usr/lib/systemd/system/radvd.service; enabled; vendor preset: disabled<span style=color:#f92672>)</span>
+Active: active <span style=color:#f92672>(</span>running<span style=color:#f92672>)</span> since Wed 2021-02-17 21:07:26 UTC; <span style=color:#ae81ff>3</span> months <span style=color:#ae81ff>5</span> days ago
+Main PID: <span style=color:#ae81ff>19061</span> <span style=color:#f92672>(</span>radvd<span style=color:#f92672>)</span>
+Tasks: <span style=color:#ae81ff>2</span> <span style=color:#f92672>(</span>limit: 26213<span style=color:#f92672>)</span>
+Memory: 4.1M
+CGroup: /system.slice/radvd.service
+├─19061 /usr/sbin/radvd -u radvd
+└─19062 /usr/sbin/radvd -u radvd
+</code></pre></div><h3 id=registry-service>Registry Service:</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ~<span style=color:#f92672>]</span>$ cd /opt/registry/
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper registry<span style=color:#f92672>]</span>$ tree -L <span style=color:#ae81ff>2</span>
+.
+├── auth
+│   └── htpasswd
+├── certs
+│   ├── certmaker.sh
+│   ├── domain.crt
+│   ├── domain.key
+│   └── old
+├── conf
+│   └── config.yml
+└── data
+    └── docker
+
+          └─28485 /usr/bin/conmon --api-version <span style=color:#ae81ff>1</span> -c 0280a5e08cdf5abd888edcca568796e3d43ddfaca61067a5a4af8e20a0163284 -u 0280a5e08cdf&gt;
+</code></pre></div><p>The registry is running in the common 5000 port as you can see:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>podman pull --authfile /home/kni/jparrill/pull_secret.json <span style=color:#66d9ef>$(</span>hostname<span style=color:#66d9ef>)</span>:5000/olm/rhacm2/thanos-rhel7@sha256:a5e90a9ab2a4176683ec567acf4c749a9cd8149d8065162ab791dbc5514605bd
+</code></pre></div><h3 id=dnsmasq><code>dnsmasq</code></h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper mgmt-converged<span style=color:#f92672>]</span>$ systemctl status dnsmasq-conv
+dnsmasq-conv.service - DNS server <span style=color:#66d9ef>for</span> OpenShift <span style=color:#ae81ff>4</span> HUB cluster.
+   Loaded: loaded <span style=color:#f92672>(</span>/etc/systemd/system/dnsmasq-conv.service; enabled; vendor preset: disabled<span style=color:#f92672>)</span>
+   Active: active <span style=color:#f92672>(</span>running<span style=color:#f92672>)</span> since Wed 2021-05-12 18:58:56 UTC; <span style=color:#ae81ff>1</span> weeks <span style=color:#ae81ff>5</span> days ago
+ Main PID: <span style=color:#ae81ff>3736</span> <span style=color:#f92672>(</span>dnsmasq<span style=color:#f92672>)</span>
+    Tasks: <span style=color:#ae81ff>4</span> <span style=color:#f92672>(</span>limit: 26213<span style=color:#f92672>)</span>
+   Memory: 12.0M
+   CGroup: /system.slice/dnsmasq-conv.service
+           ├─3736 /usr/sbin/dnsmasq -k --conf-file<span style=color:#f92672>=</span>/opt/dnsmasq/mgmt-converged/ipv6conv.conf
+           ├─5824 /usr/sbin/dnsmasq -k --conf-file<span style=color:#f92672>=</span>/opt/dnsmasq/mgmt-converged/ipv6conv.conf
+           ├─5825 /usr/sbin/dnsmasq -k --conf-file<span style=color:#f92672>=</span>/opt/dnsmasq/mgmt-converged/ipv6conv.conf
+           └─5901 /usr/sbin/dnsmasq -k --conf-file<span style=color:#f92672>=</span>/opt/dnsmasq/mgmt-converged/ipv6conv.conf
+</code></pre></div><p>The main files and configuration are in <code>/opt/dnsmasq/mgmt-converged/</code>:</p>
+<ul>
+<li><code>ipv6conv.conf</code></li>
+<li><code>ipv6conv.hossfile</code></li>
+<li><code>ipv6conv.leases</code></li>
+<li><code>mgmt-converged_dualstack</code></li>
+<li><code>mgmt-conv-resolv.conf</code></li>
+</ul>
+<p>Here, there are several files to define the DNS and DHCP for all entries and systems in the lab:</p>
+<ul>
+<li><code>ipv6conv.conf</code> contains all the DNS entry for hub, spoke1 and spoke2
+** if you need to use SNO, you must define here the DNS entry **</li>
+<li><code>ipv6conv.hostfile</code>: DHCP to set static mac (mainly for hub, and spoke <code>masters-XX</code>)</li>
+</ul>
+<h3 id=haproxy>HAProxy</h3>
+<p>The HAProxy helper is a machine to translate the IPv4 to IPv6 back-end in order to be able to access to the lab and deployments from an external point of view.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@bm-cluster-1-hyper ~<span style=color:#f92672>]</span><span style=color:#75715e># ssh root@10.19.114.100</span>
+Warning: Permanently added <span style=color:#e6db74>&#39;10.19.114.100&#39;</span> <span style=color:#f92672>(</span>ECDSA<span style=color:#f92672>)</span> to the list of known hosts.
+root@10.19.114.100<span style=color:#960050;background-color:#1e0010>&#39;</span>s password:
+Activate the web console with: systemctl enable --now cockpit.socket
+
+Last login: Mon Mar <span style=color:#ae81ff>22</span> 05:36:01 <span style=color:#ae81ff>2021</span> from 10.19.4.134
+<span style=color:#f92672>[</span>root@haproxy-ipv6 ~<span style=color:#f92672>]</span><span style=color:#75715e># vi /etc/haproxy/haproxy.cfg</span>
+
+</code></pre></div><p>In this last file you could see the translation between the IPv6 back-end to a routable IPv4 in order to access for example to the console</p>
+<h2 id=deploy-ocp-ipi-from-scratch-disconnected>Deploy OCP IPI from scratch (disconnected)</h2>
+<p>Using <code>kni</code> user (remember: <code>su - kni</code>) in the home folder you could see the <code>ipv6</code> directory which contains all the things regarding the lab:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ~<span style=color:#f92672>]</span>$ cd ipv6
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ipv6<span style=color:#f92672>]</span>$ ls
+acm-icp                        deploy_spoke2.sh              kubectl                       pull_secret.json
+acm_mirror                     dnsmasq                       localstorage                  README.md
+certified-operators-manifests  Dockerfile                    logging_and_monitoring        redhat-operator-index-manifests
+check_nodes.sh                 filesloggingmonitor           lol.yaml                      redhat-operators-manifests
+chrony.sh                      graph.png                     mario-aditya                  remote_worker_static_ipv6
+chrony-source.sh               graph.sh                      metal3-config_hub.yaml        remote_worker_static_ipv6-bigiso
+cincinnati                     ICSP                          metal3-config.yaml            repo_sync
+clean                          ICSP_OLD                      mgmt-hub                      Script
+clean.sh                       install-config-files          nginx.yaml                    small-iso-upi
+clean_spoke1.sh                install-config_hub.yaml       oc                            spoke1-upi
+clean_spoke2.sh                install-config_hub.yaml.orig  oc45                          test.json
+clouds.yaml                    install-config_spoke1.yaml    oc45bin                       time.sh
+community-operators-manifests  install-config_spoke2.yaml    ocp44mavazque                 tmp
+deploy                         ipmi.py                       ocp4-offline-operator-mirror  tools
+deploy.sh                      karim-cnf                     open-cluster-manifests        what-time.sh
+deploy_spoke1.sh               karmab-autolabeller           openshift-upi-helpers
+
+</code></pre></div><p>Basically, those are the <code>install-config</code> files needed for the hub, spoke1 and spoke2</p>
+<h2 id=pull-secret>Pull secret</h2>
+<p>It is included into the <code>install-config</code> file because of the mirroring, reducing so much the content of pull-secret</p>
+<h2 id=kubeconfig>KUBECONFIG</h2>
+<p>The path for the KUBECONFIG from the installer is:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>export KUBECONFIG<span style=color:#f92672>=</span>/home/kni/ipv6/mgmt-hub/auth/kubeconfig
+</code></pre></div><h2 id=mirroring-ocp-release>Mirroring OCP release</h2>
+<p>The first thing is to mirror is the OCP release we want, as well as the <code>oc</code> client to have them available for the disconnected environment:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ~<span style=color:#f92672>]</span>$ cd jparrill/ImageSync/
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ImageSync<span style=color:#f92672>]</span>$ ls
+ACM             ICSP_ci_registry.yaml  oc_mirror.sh  olm_sync          rhcos_downloader.sh  tools
+eran_pull.json  image_sync             old           pull_secret.json  tmp_pull.json
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ImageSync<span style=color:#f92672>]</span>$ vi oc_mirror.sh
+</code></pre></div><p>With the <code>oc_mirror</code> we&rsquo;re able to:</p>
+<ul>
+<li><code>download_oc_client</code></li>
+<li><code>download_ipi_installer</code></li>
+<li><code>ocp_mirror_release</code></li>
+<li><code>download_rhcos</code></li>
+</ul>
+<h2 id=deploy-ocp-mirrored-before>Deploy OCP mirrored before</h2>
+<ul>
+<li>We usually remove and clean everything before deploying the OCP release via the <code>clean.sh</code> file:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>CLUSTER<span style=color:#f92672>=</span>mgmt-hub
+<span style=color:#75715e>#exit 1</span>
+sudo rm -rf ./mgmt-hub
+BOOTSTRAP<span style=color:#f92672>=</span><span style=color:#66d9ef>$(</span>sudo virsh list --all | grep <span style=color:#e6db74>&#34;</span>$CLUSTER<span style=color:#e6db74>.*bootstrap&#34;</span> | awk <span style=color:#e6db74>&#39;{print $2}&#39;</span><span style=color:#66d9ef>)</span>
+sudo virsh destroy $BOOTSTRAP
+sudo virsh undefine $BOOTSTRAP
+sudo virsh vol-delete $BOOTSTRAP default
+sudo virsh vol-delete $BOOTSTRAP.ign default
+sudo rm -rf /var/lib/libvirt/openshift-images/$BOOTSTRAP
+python3 ipmi.py off install-config_hub.yaml
+</code></pre></div><p>And then, we could deploy a new OCP instance, changing the release</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ipv6<span style=color:#f92672>]</span>$ cat deploy.sh
+export OPENSHIFT_INSTALL_RELEASE_IMAGE_OVERRIDE<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;bm-cluster-1-hyper.e2e.bos.redhat.com:5000/ocp4:4.8.0-0.nightly-2021-05-25-072938&#34;</span>
+<span style=color:#75715e>#exit 1</span>
+CLUSTER<span style=color:#f92672>=</span>mgmt-hub
+rm -rf $CLUSTER
+mkdir -p $CLUSTER/openshift
+cp install-config_hub.yaml $CLUSTER/install-config.yaml
+openshift-baremetal-install --dir $CLUSTER --log-level debug create manifests
+<span style=color:#75715e># 01/28/2021 - There are some ICSPs that cause the MCP master to go into a non-rendered status</span>
+<span style=color:#75715e>#cp ICSP/* $CLUSTER/openshift/</span>
+cp ICSP/99*chrony* $CLUSTER/openshift/
+
+openshift-baremetal-install --dir $CLUSTER --log-level debug create cluster
+</code></pre></div><div class="panel panel-danger"><div class=panel-header>
+<h3><i class="fas fa-exclamation-triangle"></i>&nbsp;Verify BMC</h3>
+</div><div class=panel-body>
+<strong>_ Basically after deploy.sh launched, we need to verify the BMC for the master3-hub node due to a RAM problem in order to continue _</strong>
+</div>
+</div>
+<h2 id=iscsi>iSCSI</h2>
+<h3 id=description>Description</h3>
+<p>RHCOS Initiator:</p>
+<p><code>cat /etc/iscsi/initiatorname.iscsi</code></p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-console data-lang=console>iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster0
+iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster1
+iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster2
+iqn.2020-03.e2e.bos.redhat.com:spoke1master0
+iqn.2020-03.e2e.bos.redhat.com:spoke1master1
+iqn.2020-03.e2e.bos.redhat.com:spoke1master2
+iqn.2020-03.e2e.bos.redhat.com:spoke2master1
+iqn.2020-03.e2e.bos.redhat.com:spoke2master2
+iqn.2020-03.e2e.bos.redhat.com:spoke2master3
+<span style=color:#960050;background-color:#1e0010>
+</span><span style=color:#960050;background-color:#1e0010></span>InitiatorName=iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster0
+InitiatorName=iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster1
+InitiatorName=iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster2
+</code></pre></div><div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>systemctl enable --now iscsid.service
+iscsiadm --mode discovery --op update --type sendtargets --portal 2620:52:0:1372:eef4:bbff:feed:46b0
+iscsiadm --mode node -l all
+lsblk
+</code></pre></div><div class="panel panel-danger"><div class=panel-header>
+<h3><i class="fas fa-exclamation-triangle"></i>&nbsp;Failing route</h3>
+</div><div class=panel-body>
+If route fails
+</div>
+</div>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>sudo ip route add default via fe80::a81:f4ff:fea6:dc01 dev enp3s0f1 proto ra metric <span style=color:#ae81ff>101</span>
+ip route add 2620:52:0:1372:eef4:bbff:feed:46b0 via 2620:52:0:1302::1 dev br-ex
+</code></pre></div><h3 id=how-to-use-iscsi-to-deploy-disks-for-an-operator>how to use iSCSI to deploy disks for an operator</h3>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># vi /etc/iscsi/initiatorname.iscsi</span>
+InitiatorName<span style=color:#f92672>=</span>iqn.2020-03.e2e.bos.redhat.com:mgmthubmaster2
+
+<span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># vi /etc/iscsi/initiatorname.iscsi</span>
+<span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># systemctl enable --now iscsid.service</span>
+Created symlink /etc/systemd/system/multi-user.target.wants/iscsid.service → /usr/lib/systemd/system/iscsid.service.
+Created symlink /etc/systemd/system/sockets.target.wants/iscsid.socket → /usr/lib/systemd/system/iscsid.socket.
+<span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># vi /etc/iscsi/initiatorname.iscsi</span>
+<span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># iscsiadm --mode discovery --op update --type sendtargets --portal 2620:52:0:1372:eef4:bbff:feed:46b0</span>
+<span style=color:#f92672>[</span>2620:52:0:1372:eef4:bbff:feed:46b0<span style=color:#f92672>]</span>:3260,1 iqn.2003-01.org.linux-iscsi.ocpipv6iscsi.x8664:sn.46eadc012320
+<span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># iscsiadm --mode node -l all</span>
+Logging in to <span style=color:#f92672>[</span>iface: default, target: iqn.2003-01.org.linux-iscsi.ocpipv6iscsi.x8664:sn.46eadc012320, portal: 2620:52:0:1372:eef4:bbff:feed:46b0,3260<span style=color:#f92672>]</span>
+Login to <span style=color:#f92672>[</span>iface: default, target: iqn.2003-01.org.linux-iscsi.ocpipv6iscsi.x8664:sn.46eadc012320, portal: 2620:52:0:1372:eef4:bbff:feed:46b0,3260<span style=color:#f92672>]</span> successful.
+<span style=color:#f92672>[</span>root@openshift-master-2 core<span style=color:#f92672>]</span><span style=color:#75715e># lsblk</span>
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda      8:0    <span style=color:#ae81ff>0</span> 558.4G  <span style=color:#ae81ff>0</span> disk
+├─sda1   8:1    <span style=color:#ae81ff>0</span>     1M  <span style=color:#ae81ff>0</span> part
+├─sda2   8:2    <span style=color:#ae81ff>0</span>   127M  <span style=color:#ae81ff>0</span> part
+├─sda3   8:3    <span style=color:#ae81ff>0</span>   384M  <span style=color:#ae81ff>0</span> part /boot
+├─sda4   8:4    <span style=color:#ae81ff>0</span> 557.8G  <span style=color:#ae81ff>0</span> part /sysroot
+└─sda5   8:5    <span style=color:#ae81ff>0</span>    65M  <span style=color:#ae81ff>0</span> part
+sdb      8:16   <span style=color:#ae81ff>0</span>  93.1G  <span style=color:#ae81ff>0</span> disk
+sdc      8:32   <span style=color:#ae81ff>0</span>  93.1G  <span style=color:#ae81ff>0</span> disk
+</code></pre></div><h2 id=apply-icsp>Apply ICSP</h2>
+<p>Next thing is to apply the ICSPs (<code>jparrill/ImageSync/olm_sync/joinedicsps</code>)</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operator.openshift.io/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>ImageContentSourcePolicy</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>ztp-disconnected</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>repositoryDigestMirrors</span>:
+    <span style=color:#75715e>## LSO</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm/openshift4-ose-local-storage-static-provisioner</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>registry.redhat.io/openshift4/ose-local-storage-static-provisioner</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm/openshift4-ose-local-storage-operator-bundle</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>registry.redhat.io/openshift4/ose-local-storage-operator-bundle</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm/openshift4-ose-local-storage-operator</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>registry.redhat.io/openshift4/ose-local-storage-operator</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm/openshift4-ose-local-storage-diskmaker</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>registry.redhat.io/openshift4/ose-local-storage-diskmaker</span>
+    <span style=color:#75715e>## Hive</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm/openshift-community-operators-hive-operator</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>quay.io/openshift-community-operators/hive-operator</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm/openshift-hive-hive</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>quay.io/openshift-hive/hive</span>
+    <span style=color:#75715e>## ACM</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/rhacm2</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>quay.io/acm-d</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/rhacm2</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>quay.io:443/acm-d</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/rhacm2</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>registry.redhat.io/rhacm2</span>
+    <span style=color:#75715e>## AI</span>
+    - <span style=color:#f92672>mirrors</span>:
+        - <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/ocpmetal</span>
+      <span style=color:#f92672>source</span>: <span style=color:#ae81ff>quay.io/ocpmetal</span>
+</code></pre></div><h2 id=mirror-from-olm>Mirror from OLM</h2>
+<ul>
+<li>First of all, is to disable the operator hub source:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper jparrill<span style=color:#f92672>]</span>$ oc patch OperatorHub cluster --type json -p <span style=color:#e6db74>&#39;[{&#34;op&#34;: &#34;add&#34;, &#34;path&#34;: &#34;/spec/disableAllDefaultSources&#34;, &#34;value&#34;: true}]&#39;</span>
+operatorhub.config.openshift.io/cluster patched
+
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper jparrill<span style=color:#f92672>]</span>$ oc patch provisioning provisioning-configuration --type merge -p <span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;watchAllNamespaces&#34;: true}}&#39;</span>
+provisioning.metal3.io/provisioning-configuration patched
+
+</code></pre></div><ul>
+<li>Get into the <code>ImageSync</code> and <code>olm_sync</code> folder:</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper jparrill<span style=color:#f92672>]</span>$ cd ImageSync/
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ImageSync<span style=color:#f92672>]</span>$ ls
+ACM             ICSP_ci_registry.yaml  oc_mirror.sh  olm_sync          rhcos_downloader.sh  tools
+eran_pull.json  image_sync             old           pull_secret.json  tmp_pull.json
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper ImageSync<span style=color:#f92672>]</span>$ cd olm_sync/
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$ ls
+community-operator-index-manifests  index.Dockerfile020740601  joinedicsps          original
+imagelist                           index.Dockerfile278243421  lol.sh               pre.sh
+index_build_tmp318614390            index_tmp_315658500        olm-operator.sh      redhat-operator-index-manifests
+index_build_tmp871886978            index_tmp_475347992        olm-operator.sh.old
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$
+
+</code></pre></div><ul>
+<li>Run the <code>olm-operator.sh mirror</code> (REMEMBER WITH <code>sudo</code> as <code>root</code>)
+The mirror is just only used to mirroring what we want (see the content of script and review the content of this array which are the only ones we&rsquo;re mirroring: <code>export RH_OP_PACKAGES='advanced-cluster-management,local-storage-operator,ocs-operator,performance-addon-operator,ptp-operator,sriov-network-operator'</code> )</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>root@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span><span style=color:#75715e># ./olm-operator.sh mirror</span>
+opm index prune --from-index registry.redhat.io/redhat/redhat-operator-index:v4.8 --packages advanced-cluster-management,local-storage-operator,ocs-operator,performance-addon-operator,ptp-operator,sriov-network-operator --tag bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm-index/redhat-operator-index:v4.8
+INFO<span style=color:#f92672>[</span>0000<span style=color:#f92672>]</span> pruning the index                             packages<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;[advanced-cluster-management local-storage-operator ocs-operator performance-addon-operator ptp-operator sriov-network-operator]&#34;</span>
+INFO<span style=color:#f92672>[</span>0000<span style=color:#f92672>]</span> Pulling previous image registry.redhat.io/redhat/redhat-operator-index:v4.8 to get metadata  packages<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;[advanced-cluster-management local-storage-operator ocs-operator performance-addon-operator ptp-operator sriov-network-operator]&#34;</span>
+INFO<span style=color:#f92672>[</span>0000<span style=color:#f92672>]</span> running /bin/podman pull registry.redhat.io/redhat/redhat-operator-index:v4.8  packages<span style=color:#f92672>=</span><span style=color:#e6db74>&#34;[advanced-cluster-management local-storage-operator ocs-operator performance-addon-operator ptp-operator sriov-network-operator]&#34;</span>
+
+--- Time to finish over <span style=color:#ae81ff>60</span> min
+</code></pre></div><p>The result of this command is a <code>catalogsource</code> manifest in the folder <code>redhat-operator-index-manifests/catalogsource.yaml</code>:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>operators.coreos.com/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>CatalogSource</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>my-operator-catalog</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>openshift-marketplace</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>sourceType</span>: <span style=color:#ae81ff>grpc</span>
+  <span style=color:#f92672>image</span>: <span style=color:#ae81ff>bm-cluster-1-hyper.e2e.bos.redhat.com:5000/olm-index/redhat-operator-index:v4.8</span>
+  <span style=color:#f92672>displayName</span>: <span style=color:#ae81ff>Temp Lab</span>
+  <span style=color:#f92672>publisher</span>: <span style=color:#ae81ff>templab</span>
+  <span style=color:#f92672>updateStrategy</span>:
+    <span style=color:#f92672>registryPoll</span>:
+      <span style=color:#f92672>interval</span>: <span style=color:#ae81ff>30m</span>
+</code></pre></div><p>But in this case we&rsquo;re gonna use the next one which are modified to have all in one and you need to modify the different</p>
+<p>Review <code>[kni@bm-cluster-1-hyper joinedicsps]$ cat joined-catalogsource_48.yaml</code></p>
+<p><img src=img/diff1.png alt=img/diff1.png></p>
+<p>And then, load the file to create the catalog source:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$ oc apply -f joinedicsps/joined-catalogsource_48.yaml
+catalogsource.operators.coreos.com/custom-redhat-operator-catalog-v4-8 created
+catalogsource.operators.coreos.com/custom-community-operator-catalog-v4-8 created
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$ watch oc get pod -n openshift-marketplace
+Every 2.0s: oc get pod -n openshift-marketplace                         bm-cluster-1-hyper.e2e.bos.redhat.com: Wed May <span style=color:#ae81ff>26</span> 14:48:49 <span style=color:#ae81ff>2021</span>
+
+NAME                                           READY   STATUS              RESTARTS   AGE
+custom-community-operator-catalog-v4-8-7m5hl   0/1     ContainerCreating   <span style=color:#ae81ff>0</span>          2s
+custom-redhat-operator-catalog-v4-8-2qg6z      0/1     ContainerCreating   <span style=color:#ae81ff>0</span>          2s
+custom-redhat-operator-catalog-v4-8-k62pf      0/1     Terminating         <span style=color:#ae81ff>0</span>          2s
+marketplace-operator-5bc5d894-5969k            1/1     Running             <span style=color:#ae81ff>0</span>          5h56m
+
+</code></pre></div><p>Sometimes the first mirror fails so we need to do also the <code>olm-mirror</code>:</p>
+<ul>
+<li>Create dry-run to verify and launch after that the <code>olm-mirror</code> (REMEMBER ROOT to avoid this message error):</li>
+</ul>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh><span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$ ./lol.sh
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$
+
+<span style=color:#75715e>## As ROOT</span>
+<span style=color:#f92672>[</span>kni@bm-cluster-1-hyper olm_sync<span style=color:#f92672>]</span>$ ./olm-operator.sh mirror-olm
+
+Package: registry.redhat.io/openshift4/ose-kube-rbac-proxy@sha256:66e75f01f24990f9d4da95f90eaf942c766f6526471725842f319c9e24a4892b
+Getting image list signatures
+Copying <span style=color:#ae81ff>3</span> of <span style=color:#ae81ff>3</span> images in list
+Copying image sha256:d075fc667ca27edc768175f36a0bf590c9ca822178aed281afaabd4938847f6a <span style=color:#f92672>(</span>1/3<span style=color:#f92672>)</span>
+Getting image source signatures
+Checking <span style=color:#66d9ef>if</span> image destination supports signatures
+Copying blob e6922a199ee7 skipped: already exists
+Copying blob 30549ab34ab6 skipped: already exists
+Copying blob 4e518f14e802 skipped: already exists
+Copying blob 40a89a664d88 skipped: already exists
+Copying blob 9580e7723df9 <span style=color:#f92672>[</span>--------------------------------------<span style=color:#f92672>]</span> 0.0b / 0.0b
+Copying config fb63781dae <span style=color:#f92672>[======================================]</span> 5.4KiB / 5.4KiB
+Writing manifest to image destination
+Storing signatures
+FATA<span style=color:#f92672>[</span>0007<span style=color:#f92672>]</span> Error writing signatures: mkdir /var/lib/containers/sigstore/olm: permission denied
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/ title="Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/rhacm/ title="Red Hat Advanced Cluster Management (ACM)">Next - Red Hat Advanced Cluster Management (ACM) <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

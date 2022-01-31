@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>keywords on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/keywords/</link>
+    <description>Recent content in keywords on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/keywords/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Vocabulary</title>
+      <link>https://pages.sysdeseng.com/labs/vocabulary/vocabulary/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/vocabulary/vocabulary/</guid>
+      <description>ACM: Advanced Cluster Manager. Allows to manage clusters in a structure of one-to-many (Hub-Spoke) for orchestration. HUB: Cluster executing ACM with one or more Spoke clusters assigned. IPI: Installer-Provisioned Infrastructure NFV: Network Functions Virtualization OCP: OpenShift Container Platform OKD: OpenShift Kubernetes Distribution is the upstream for the OpenShift Container Platform product. OpenShift: OpenShift is a family of containerization software products developed by Red Hat. Its flagship product is the OpenShift Container Platform — an on-premises platform as a service built around Docker containers orchestrated and managed by Kubernetes on a foundation of Red Hat Enterprise Linux.</description>
+    </item>
+    
+  </channel>
+</rss>

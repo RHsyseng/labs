@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AICLI on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/aicli/</link>
+    <description>Recent content in AICLI on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/aicli/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>RWN to Assisted Installer using AICLI API</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rwn-to-ai-using-aicli-api
+Scenario Description Once we&amp;rsquo;ve got a 3 master cluster installed with the AI operator, this document is useful to add new remote worker nodes (maybe worker nodes using the same network)
+In this case, we&amp;rsquo;ve got 2 possibilities to do that:
+ Using the API or maybe an abstraction using AICLI Using the CRD operator (not developed yet)  Requirement We need an environment with:
+ Hub deployment ready (UPI,IPI whatever) AI operator + Hive + LocalStorage Cluster 3 multi-node (not possible to do using SNO).</description>
+    </item>
+    
+  </channel>
+</rss>

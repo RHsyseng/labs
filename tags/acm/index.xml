@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>ACM on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/acm/</link>
+    <description>Recent content in ACM on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/acm/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/</guid>
+      <description>References Lab-index branch: sno-acm-stark
+https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal
+https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+Previous Requirements  Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster. This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.  ACM Installation Using the next script to install the ACM on the Single Node Cluster:</description>
+    </item>
+    
+    <item>
+      <title>Red Hat Advanced Cluster Management (ACM)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/rhacm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/rhacm/</guid>
+      <description>References:   Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+  quay.io RHACM tags: https://quay.io/repository/acm-d/acm-custom-registry?tab=tags
+  quay.io RHACM bundle: https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags
+  official doc for deployment: https://github.com/open-cluster-management/deploy
+  The way to deploy: https://github.com/jparrill/ztp-the-hard-way
+  Requirements  Existing OCP cluster ready. Follow this instructions to get ready: https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md LocalStorage deployed on the OCP cluster. Follow these instructions to get deployed: https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md. Remember if you&amp;rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of LS.</description>
+    </item>
+    
+    <item>
+      <title>Using Advanced Cluster Management (ACM)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-hub-spoke-over-acm
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Create the pull-secret This pull-secret will be injected into the discovery ISO, so it needs to be a valid pull-secret and be able to pull from the registries you&amp;rsquo;re going to use for the deployment. If you have some doubts you could use the next tool to verify it: pull secret validator</description>
+    </item>
+    
+    <item>
+      <title>Virtual over ACM</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/</guid>
+      <description>Reference Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-BMHost-virtual-over-acm
+To have a full reference there&amp;rsquo;s a deploy script inside the deploy folder mentioned before, with all the steps shown here.
+Scenario Description The main goal of this document is to explain the deployment of a baremetal host over RHACM. This lab uses sushy tools to emulate the same situation which we could found using a real Baremetal host.
+Requirements  Hub cluster deployed successfully LocalStorage ready Hive operator ready ACM with AI Operator ready  Install sushy-tools &amp;nbsp;Information If you&amp;rsquo;ve installed IPI baremetal with Kcli and virtual_protocol: Redfish -&amp;gt; you could omit this step because it is already installed.</description>
+    </item>
+    
+  </channel>
+</rss>

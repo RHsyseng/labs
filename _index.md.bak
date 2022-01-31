@@ -1,0 +1,15 @@
+---
+title: Lab index
+---
+
+# Disclaimer
+
+{{< panel status="danger" title="UNSUPPORTED" icon="fas fa-exclamation-triangle" >}}
+This repository and its contents are completely UNSUPPORTED in any way and are not part of official documentation.
+{{< /panel >}}
+
+{{< panel status="notice" title="Contribute!" icon="fas fa-information" >}}
+The documents hosted here are just personal notes, if you feel that you can contribute into polishing them as guides, feel free to let us know via issues to this repository.
+{{< /panel >}}
+
+[https://gihub.com/RHsyseng/labs](https://gihub.com/RHsyseng/labs)

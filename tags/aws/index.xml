@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>AWS on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/tags/aws/</link>
+    <description>Recent content in AWS on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/tags/aws/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>OpenShift 4.7 on AWS</title>
+      <link>https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/</guid>
+      <description>reference:
+Lab Folder: N/A (There is not Lab folder created for this one because we&amp;rsquo;re following the official cloud doc to get the binary and installing directly)
+URL guides followed:  GCP: https://www.openshift.com/blog/ocp-4.6-install-on-gcp-cloud-the-smooth-experience AWS: https://docs.openshift.com/container-platform/4.7/installing/installing_aws/installing-aws-default.html  Download IPI installer. There are two ways:
+ Mirror: https://mirror.openshift.com/pub/openshift-v4/clients/ocp/stable/ Official site: https://cloud.redhat.com/openshift/create/cloud and https://cloud.redhat.com/openshift/install/aws  Procedure:
+ Download the IPI installer from the web. Download the pull secret Install oc client in your path if you didn’t install it before  Configure DNS zone When IPI installer is run, one of the interactive steps looks for DNS name to use in the cluster.</description>
+    </item>
+    
+  </channel>
+</rss>

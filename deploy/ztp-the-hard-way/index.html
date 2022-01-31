@@ -1,0 +1,189 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ZTP The Hard Way - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="ZTP The Hard Way">
+<meta property="og:description" content="References: ZTP For Telco Edge 5G  What is ZTP? Context on ZTP architecture  Disconnected ZTP Flow Connected ZTP Flow ZTP Hub Components   How to start with ZTP?    References:  The original repository: https://github.com/jparrill/ztp-the-hard-way  ZTP For Telco Edge 5G Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&rsquo;s get started from the beginning with some context and theory.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="ZTP The Hard Way">
+<meta name=twitter:description content="References: ZTP For Telco Edge 5G  What is ZTP? Context on ZTP architecture  Disconnected ZTP Flow Connected ZTP Flow ZTP Hub Components   How to start with ZTP?    References:  The original repository: https://github.com/jparrill/ztp-the-hard-way  ZTP For Telco Edge 5G Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&rsquo;s get started from the beginning with some context and theory.">
+<meta itemprop=name content="ZTP The Hard Way">
+<meta itemprop=description content="References: ZTP For Telco Edge 5G  What is ZTP? Context on ZTP architecture  Disconnected ZTP Flow Connected ZTP Flow ZTP Hub Components   How to start with ZTP?    References:  The original repository: https://github.com/jparrill/ztp-the-hard-way  ZTP For Telco Edge 5G Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&rsquo;s get started from the beginning with some context and theory.">
+<meta itemprop=wordCount content="457"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="ZTP,labs,IPv6,disconnected,physical,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>ZTP The Hard Way</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#what-is-ztp>What is ZTP?</a></li>
+<li><a href=#context-on-ztp-architecture>Context on ZTP architecture</a>
+<ul>
+<li><a href=#disconnected-ztp-flow>Disconnected ZTP Flow</a></li>
+<li><a href=#connected-ztp-flow>Connected ZTP Flow</a></li>
+<li><a href=#ztp-hub-components>ZTP Hub Components</a></li>
+</ul>
+</li>
+<li><a href=#how-to-start-with-ztp>How to start with ZTP?</a></li>
+</ul>
+</nav></aside>
+<ul>
+<li><a href=#references>References:</a></li>
+<li><a href=#ztp-for-telco-edge-5g>ZTP For Telco Edge 5G</a>
+<ul>
+<li><a href=#what-is-ztp>What is ZTP?</a></li>
+<li><a href=#context-on-ztp-architecture>Context on ZTP architecture</a>
+<ul>
+<li><a href=#disconnected-ztp-flow>Disconnected ZTP Flow</a></li>
+<li><a href=#connected-ztp-flow>Connected ZTP Flow</a></li>
+<li><a href=#ztp-hub-components>ZTP Hub Components</a></li>
+</ul>
+</li>
+<li><a href=#how-to-start-with-ztp>How to start with ZTP?</a></li>
+</ul>
+</li>
+</ul>
+<h1 id=references>References:</h1>
+<ul>
+<li>The original repository: <a href=https://github.com/jparrill/ztp-the-hard-way>https://github.com/jparrill/ztp-the-hard-way</a></li>
+</ul>
+<h1 id=ztp-for-telco-edge-5g>ZTP For Telco Edge 5G</h1>
+<p>Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&rsquo;s get started from the beginning with some context and theory.</p>
+<h2 id=what-is-ztp>What is ZTP?</h2>
+<p>ZTP stands for Zero Touch Provisioning, a project to deploy and deliver OpenShift 4 in a HUB-SPOKE architecture (in a relation of 1-N), where the HUB will manage many Spokes. The Hub and the Spokes will be based on OpenShift 4 but with the difference that the HUB cluster will manage and deploy the spokes using RHACM (Red Hat Advanced Cluster Management).</p>
+<p><strong>Why Zero Touch Provisioning If I need to deploy some things by hand?</strong>, well this is a fair question, we need to have a consistent base for the hub to perform the Spoke deployments and for that we need to deploy OpenShift Container Platform 4 (On an IPI way) if not we will have the egg-chicken issue.</p>
+<p><strong>Why is this related with Single Node OpenShift (SNO) and Remote Worker Node (RWN)?</strong>, in the 5G world exists some areas called RAN (Radio Access Network) here we have some scenarios but the important points here is, SNO will be mostly on the D-RAN places and eventually on C-RAN ones, this happens in the same way with RWN.</p>
+<h2 id=context-on-ztp-architecture>Context on ZTP architecture</h2>
+<p>On a high level view, we have two scenarios, the connected world and the disconnected world which means, that your OpenShift nodes can access directly to the Internet or not. From here we need to separate them in two ways to follow. the disconnected one will need to fill some pre-requisites before the action starts, let&rsquo;s take a look to some diagrams:</p>
+<h3 id=disconnected-ztp-flow>Disconnected ZTP Flow</h3>
+<p><img src="https://github.com/jparrill/ztp-the-hard-way/blob/1e333101ec512d06805bbaf0b7760f73e15995c6/assets/ztp-flow-disconnected.png?raw=true" alt="https://github.com/jparrill/ztp-the-hard-way/blob/1e333101ec512d06805bbaf0b7760f73e15995c6/assets/ztp-flow-disconnected.png?raw=true"></p>
+<h3 id=connected-ztp-flow>Connected ZTP Flow</h3>
+<p><img src="https://github.com/jparrill/ztp-the-hard-way/blob/main/assets/ztp-flow-connected.png?raw=true" alt="https://github.com/jparrill/ztp-the-hard-way/blob/main/assets/ztp-flow-connected.png?raw=true"></p>
+<p>These are the steps 1-by-1 that we need to follow in order to deploy every element of ZTP, including the Hub and the Spoke cluster. As you see, there are some differences between those but mostly on the pre-requisites side.</p>
+<h3 id=ztp-hub-components>ZTP Hub Components</h3>
+<p>Here we will need some basic components, the OpenShift Hub cluster will need at least:</p>
+<ul>
+<li>OpenShift Container Platform version 4 in a IPI deployment way (which includes Metal³ pods)</li>
+<li>Storage to work with (3 PVs at least to deploy ACM)</li>
+<li>ACM Software available (v2.3.0)
+<ul>
+<li>Hive</li>
+<li>Assisted Installer</li>
+</ul>
+</li>
+<li>The manifests to create the Spoke clusters</li>
+<li>The Bare-Metal nodes to deploy OpenShift on top of them</li>
+</ul>
+<h2 id=how-to-start-with-ztp>How to start with ZTP?</h2>
+<p>Well, we can discover how to deal with ZTP following these steps:</p>
+<ol>
+<li><a href=https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/disconnected-ZTP-flow-hub-deployment.md>Disconnected ZTP Flow Hub deployment</a></li>
+<li><a href=https://github.com/jparrill/ztp-the-hard-way/blob/main/docs/connected-ZTP-flow-hub-deployment.md>Connected ZTP Flow Hub deployment</a></li>
+</ol>
+<div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/rhacm/ title="Red Hat Advanced Cluster Management (ACM)"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Red Hat Advanced Cluster Management (ACM)</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/vocabulary/ title=Vocabularies>Next - Vocabularies <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

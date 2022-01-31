@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Deploy Operators and Resources on Labs@Sysdeseng</title>
+    <link>https://pages.sysdeseng.com/labs/deploy/</link>
+    <description>Recent content in Deploy Operators and Resources on Labs@Sysdeseng</description>
+    <generator>Hugo -- gohugo.io</generator><atom:link href="https://pages.sysdeseng.com/labs/deploy/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/</guid>
+      <description>References Lab-index branch: sno-acm-stark
+https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal
+https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+Previous Requirements  Single Node Cluster deployed and ready to be used. In the reference section, you will find information about the installation of a Single Node Cluster. This document begins with the installation of the ACM and the Spoke SNO on top of the Single Node Cluster.  ACM Installation Using the next script to install the ACM on the Single Node Cluster:</description>
+    </item>
+    
+    <item>
+      <title>Physical IPv6 Disconnected Lab</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/</guid>
+      <description>In this laboratory, we will deploy over IPv6 using a disconnected environment, that means, having no Internet connectivity to reach the external servers required for installation.
+Hosts hostname: bm-cluster-1-hyper.e2e.bos.redhat.com
+&amp;nbsp;danger Must use kni user instead of root, so su - kni   References Lab Folder: N/A (There isn&amp;rsquo;t any Lab folder in this repository because this document is just the documentation for the Disconnected Physical Lab.)
+Lab info https://gitlab.cee.redhat.com/sysdeseng/pit-hybrid/-/blob/master/docs/acm-verizon-demo-ipv6/baremetal-ipv6.md</description>
+    </item>
+    
+    <item>
+      <title>Red Hat Advanced Cluster Management (ACM)</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/rhacm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/rhacm/</guid>
+      <description>References:   Deploy Folder: https://github.com/RHsyseng/labs-index/tree/master/deploy-rhacm
+  quay.io RHACM tags: https://quay.io/repository/acm-d/acm-custom-registry?tab=tags
+  quay.io RHACM bundle: https://quay.io/repository/acm-d/acm-operator-bundle?tab=tags
+  official doc for deployment: https://github.com/open-cluster-management/deploy
+  The way to deploy: https://github.com/jparrill/ztp-the-hard-way
+  Requirements  Existing OCP cluster ready. Follow this instructions to get ready: https://github.com/RHsyseng/labs-index/blob/master/docs/lab-kcli-ipi.md LocalStorage deployed on the OCP cluster. Follow these instructions to get deployed: https://github.com/RHsyseng/labs-index/blob/master/docs/deploy-LocalStorage-operator.md. Remember if you&amp;rsquo;re using a kcli plan to deploy IPI baremetal, NFS disks will be installed instead of LS.</description>
+    </item>
+    
+    <item>
+      <title>ZTP The Hard Way</title>
+      <link>https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/</guid>
+      <description>References: ZTP For Telco Edge 5G  What is ZTP? Context on ZTP architecture  Disconnected ZTP Flow Connected ZTP Flow ZTP Hub Components   How to start with ZTP?    References:  The original repository: https://github.com/jparrill/ztp-the-hard-way  ZTP For Telco Edge 5G Here, we will collect all the info around the ZTP flow, which are the preferred scenarios, the steps to follow and much more. Let&amp;rsquo;s get started from the beginning with some context and theory.</description>
+    </item>
+    
+  </channel>
+</rss>

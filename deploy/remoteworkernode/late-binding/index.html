@@ -1,0 +1,388 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Late Binding adding new agents - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="Late Binding adding new agents">
+<meta property="og:description" content="Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) Hive operator installed AI installed  Create the pull secret You need to create a secret in the cluster that contains the pull secret for the registry.
+apiVersion: v1 kind: Secret metadata: name: assisted-deployment-pull-secret namespace: assisted-installer stringData: .dockerconfigjson: 'PULL_SECRET' # replace with your pull secret type: kubernetes.io/dockerconfigjson Create the private ssh key You need to create a secret in the cluster that contains the private ssh key for the registry.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="Deploy">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="Late Binding adding new agents">
+<meta name=twitter:description content="Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) Hive operator installed AI installed  Create the pull secret You need to create a secret in the cluster that contains the pull secret for the registry.
+apiVersion: v1 kind: Secret metadata: name: assisted-deployment-pull-secret namespace: assisted-installer stringData: .dockerconfigjson: 'PULL_SECRET' # replace with your pull secret type: kubernetes.io/dockerconfigjson Create the private ssh key You need to create a secret in the cluster that contains the private ssh key for the registry.">
+<meta itemprop=name content="Late Binding adding new agents">
+<meta itemprop=description content="Requirements The starting point of this document is based on the following things installed previously:
+ Hub clusters ocp ipi baremetal installed (multinode) Hive operator installed AI installed  Create the pull secret You need to create a secret in the cluster that contains the pull secret for the registry.
+apiVersion: v1 kind: Secret metadata: name: assisted-deployment-pull-secret namespace: assisted-installer stringData: .dockerconfigjson: 'PULL_SECRET' # replace with your pull secret type: kubernetes.io/dockerconfigjson Create the private ssh key You need to create a secret in the cluster that contains the private ssh key for the registry.">
+<meta itemprop=wordCount content="1042"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="late binding,Assisted Installer,agents,labs,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>Late Binding adding new agents</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li><a href=#requirements>Requirements</a></li>
+<li><a href=#create-the-pull-secret>Create the pull secret</a></li>
+<li><a href=#create-the-private-ssh-key>Create the private ssh key</a></li>
+<li><a href=#create-the-infraenv-without-cluster-reference>Create the Infraenv without cluster reference</a></li>
+<li><a href=#verify-the-infraenv-url-without-cluster-reference>Verify the infraenv URL without cluster reference</a></li>
+<li><a href=#create-the-vm-and-the-bmh-with-the-infraenv-reference>Create the VM and the BMH with the infraenv reference</a></li>
+<li><a href=#verify-the-agent-boot-up-process>Verify the agent boot up process</a></li>
+<li><a href=#simulate-late-binding-to-add-node-to-the-cluster>Simulate late binding to add node to the cluster</a></li>
+<li><a href=#verify-the-cluster-column-now-is-the-cluster-reference-name>Verify the cluster column now is the cluster reference name</a></li>
+</ul>
+</nav></aside>
+<h2 id=requirements>Requirements</h2>
+<p>The starting point of this document is based on the following things installed previously:</p>
+<ul>
+<li><a href=https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal>Hub clusters ocp ipi baremetal installed (multinode)</a></li>
+<li><a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-hive-operator>Hive operator installed</a></li>
+<li><a href=https://github.com/RHsyseng/labs-index/tree/master/deploy-AssistedInstaller-operator>AI installed</a></li>
+</ul>
+<h2 id=create-the-pull-secret>Create the pull secret</h2>
+<p>You need to create a secret in the cluster that contains the pull secret for the registry.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>stringData</span>:
+  <span style=color:#f92672>.dockerconfigjson</span>: <span style=color:#e6db74>&#39;PULL_SECRET&#39;</span>    <span style=color:#75715e># replace with your pull secret</span>
+  <span style=color:#f92672>type</span>: <span style=color:#ae81ff>kubernetes.io/dockerconfigjson</span>
+</code></pre></div><h2 id=create-the-private-ssh-key>Create the private ssh key</h2>
+<p>You need to create a secret in the cluster that contains the private ssh key for the registry.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>creationTimestamp</span>: <span style=color:#66d9ef>null</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-ssh-private-key</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Opaque</span>
+<span style=color:#f92672>stringData</span>:                           <span style=color:#75715e># paste your private ssh key here</span>
+</code></pre></div><h2 id=create-the-infraenv-without-cluster-reference>Create the Infraenv without cluster reference</h2>
+<p>The idea is create the infraenv without cluster reference in order to keep the agent alone (without binding to a cluster). This is a good use case in order to keep nodes prepared to be added to a cluster later.
+To do that, you need to remove the reference from this manifest to get something like this:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>InfraEnv</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-env</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>sshAuthorizedKey</span>: <span style=color:#ae81ff>PUB_SSH_KEY</span>
+  <span style=color:#f92672>agentLabelSelector</span>:
+    <span style=color:#f92672>matchLabels</span>:
+      <span style=color:#f92672>bla</span>: <span style=color:#ae81ff>aaa</span>
+  <span style=color:#f92672>pullSecretRef</span>:
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+  <span style=color:#f92672>ignitionConfigOverride</span>: <span style=color:#e6db74>&#34;&#34;</span>
+</code></pre></div><h2 id=verify-the-infraenv-url-without-cluster-reference>Verify the infraenv URL without cluster reference</h2>
+<p>As you can see in the output, the URL is present, but the cluster reference does not appear. So, when the agent boot up will be ready with the image but not bound to a cluster.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>items</span>:
+- <span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+  <span style=color:#f92672>kind</span>: <span style=color:#ae81ff>InfraEnv</span>
+  <span style=color:#f92672>metadata</span>:
+    <span style=color:#f92672>creationTimestamp</span>: <span style=color:#e6db74>&#34;2021-09-29T09:41:49Z&#34;</span>
+    <span style=color:#f92672>generation</span>: <span style=color:#ae81ff>1</span>
+    <span style=color:#f92672>managedFields</span>:
+    - <span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+      <span style=color:#f92672>fieldsType</span>: <span style=color:#ae81ff>FieldsV1</span>
+      <span style=color:#f92672>fieldsV1</span>:
+        <span style=color:#f92672>f:status</span>:
+          <span style=color:#f92672>.</span>: {}
+          <span style=color:#f92672>f:agentLabelSelector</span>:
+            <span style=color:#f92672>.</span>: {}
+            <span style=color:#f92672>f:matchLabels</span>:
+              <span style=color:#f92672>.</span>: {}
+              <span style=color:#f92672>f:infraenvs.agent-install.openshift.io</span>: {}
+          <span style=color:#f92672>f:conditions</span>: {}
+          <span style=color:#f92672>f:createdTime</span>: {}
+          <span style=color:#f92672>f:debugInfo</span>:
+            <span style=color:#f92672>.</span>: {}
+            <span style=color:#f92672>f:eventsURL</span>: {}
+          <span style=color:#f92672>f:isoDownloadURL</span>: {}
+      <span style=color:#f92672>manager</span>: <span style=color:#ae81ff>assisted-service</span>
+      <span style=color:#f92672>operation</span>: <span style=color:#ae81ff>Update</span>
+      <span style=color:#f92672>time</span>: <span style=color:#e6db74>&#34;2021-09-29T09:41:48Z&#34;</span>
+    - <span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+      <span style=color:#f92672>fieldsType</span>: <span style=color:#ae81ff>FieldsV1</span>
+      <span style=color:#f92672>fieldsV1</span>:
+        <span style=color:#f92672>f:spec</span>:
+          <span style=color:#f92672>.</span>: {}
+          <span style=color:#f92672>f:ignitionConfigOverride</span>: {}
+          <span style=color:#f92672>f:pullSecretRef</span>:
+            <span style=color:#f92672>.</span>: {}
+            <span style=color:#f92672>f:name</span>: {}
+          <span style=color:#f92672>f:sshAuthorizedKey</span>: {}
+      <span style=color:#f92672>manager</span>: <span style=color:#ae81ff>kubectl-create</span>
+      <span style=color:#f92672>operation</span>: <span style=color:#ae81ff>Update</span>
+      <span style=color:#f92672>time</span>: <span style=color:#e6db74>&#34;2021-09-29T09:41:49Z&#34;</span>
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-env</span>
+    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+    <span style=color:#f92672>resourceVersion</span>: <span style=color:#e6db74>&#34;36982&#34;</span>
+    <span style=color:#f92672>uid</span>: <span style=color:#ae81ff>f9bcf293-cc56-42bb-9805-30c6956641c6</span>
+  <span style=color:#f92672>spec</span>:
+    <span style=color:#f92672>ignitionConfigOverride</span>: <span style=color:#e6db74>&#34;&#34;</span>
+    <span style=color:#f92672>pullSecretRef</span>:
+      <span style=color:#f92672>name</span>: <span style=color:#ae81ff>assisted-deployment-pull-secret</span>
+    <span style=color:#f92672>sshAuthorizedKey</span>: <span style=color:#ae81ff>ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC91EBwUsDI71XbKOBz+rVYqiLkQhubrcG5jEumlHsVoMAOfoA4WcXF76bRODx+CgR2iA+DHpbRPfRj1vWXK09kqveAGEp0QYPv</span>
+<span style=color:#ae81ff>1vL++Mi6U/YKqR40EJ92Yge2wpAMeWZ8QFjICGGv9dKDbDM/CXGv8VTW921RD9xzVaL8l0Qu8gi8ZAYgNCVM6i6Cwrrjk9PHWHxAM3UcnD+zwH0N0Df7Z/QY8QfRkVxLYbNoOZLWsifDV4Nh1xBnxQuaM7N8dU</span>
+<span style=color:#ae81ff>A9xCoc8lm/OCW4y5y9ZCIKW+F8ETyf6d8eoswWuWAUorKJdW1dLJoT4fo8N8VwMgMpg55x3p/Nigqzil1B14T/ root@qct-d14u11.vlan208</span>
+  <span style=color:#f92672>status</span>:
+    <span style=color:#f92672>agentLabelSelector</span>:
+      <span style=color:#f92672>matchLabels</span>:
+        <span style=color:#f92672>infraenvs.agent-install.openshift.io</span>: <span style=color:#ae81ff>lab-env</span>
+    <span style=color:#f92672>conditions</span>:
+    - <span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-09-29T09:41:50Z&#34;</span>
+      <span style=color:#f92672>message</span>: <span style=color:#ae81ff>Image has been created</span>
+      <span style=color:#f92672>reason</span>: <span style=color:#ae81ff>ImageCreated</span>
+      <span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+      <span style=color:#f92672>type</span>: <span style=color:#ae81ff>ImageCreated</span>
+    <span style=color:#f92672>createdTime</span>: <span style=color:#e6db74>&#34;2021-09-29T09:41:50Z&#34;</span>
+    <span style=color:#f92672>debugInfo</span>:
+      <span style=color:#f92672>eventsURL</span>: <span style=color:#e6db74>&#34;&#34;</span>
+    <span style=color:#f92672>isoDownloadURL</span>: <span style=color:#ae81ff>https://assisted-image-service-assisted-installer.apps.test-ci.alklabs.com/images/910662e2-b814-4cc5-8017-1e4f523fcfc0?api_key=eyJhbGciOiJ</span>
+<span style=color:#ae81ff>FUzI1NiIsInR5cCI6IkpXVCJ9.eyJpbmZyYV9lbnZfaWQiOiI5MTA2NjJlMi1iODE0LTRjYzUtODAxNy0xZTRmNTIzZmNmYzAifQ.GXK5ZmBZzfENSgPaybqAj_2yZ4_38Jb4r4bBvtZGhlIHB-I7_FT6wSapH</span>
+<span style=color:#ae81ff>5nmq6xpmCbceP6V0aXYj7CwFI4JYw&amp;arch=x86_64&amp;type=minimal-iso&amp;version=4.9</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>List</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>resourceVersion</span>: <span style=color:#e6db74>&#34;&#34;</span>
+  <span style=color:#f92672>selfLink</span>: <span style=color:#e6db74>&#34;&#34;</span>
+</code></pre></div><h2 id=create-the-vm-and-the-bmh-with-the-infraenv-reference>Create the VM and the BMH with the infraenv reference</h2>
+<p>To do that we are going to use this <a href=https://github.com/RHsyseng/labs-index/blob/master/deploy-BMHost-virtual-over-AI/deploy.sh>script</a> which basically creates the VM/VMs (depending the number of nodes you want) and deploy the bmh manifest according to the number of nodes you want.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e>#!/usr/bin/env bash
+</span><span style=color:#75715e></span>
+set -o errexit
+set -o pipefail
+set -o nounset
+set -m
+
+<span style=color:#75715e># variables</span>
+<span style=color:#75715e># #########</span>
+<span style=color:#75715e># export OC_CLUSTER_NAME=test-ci</span>
+<span style=color:#75715e># export IP_INSTALLER=$ip_installer</span>
+<span style=color:#75715e># export OC_MASTER_SPOKE=3</span>
+<span style=color:#75715e># export SHARED_DIR=shared-utils</span>
+export KUBECONFIG<span style=color:#f92672>=</span>~/.kcli/clusters/<span style=color:#e6db74>&#34;</span>$OC_CLUSTER_NAME<span style=color:#e6db74>&#34;</span>/auth/kubeconfig
+
+source ../<span style=color:#e6db74>&#34;</span>$SHARED_DIR<span style=color:#e6db74>&#34;</span>/inventory.sh
+
+
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt; Set correct number of spokes and create the bmh&#34;</span>
+echo <span style=color:#e6db74>&#34;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&#34;</span>
+<span style=color:#66d9ef>if</span> <span style=color:#f92672>[</span> <span style=color:#e6db74>&#34;</span>$OC_MASTER_SPOKE<span style=color:#e6db74>&#34;</span> <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;3&#39;</span> <span style=color:#f92672>]</span>;<span style=color:#66d9ef>then</span>
+    echo <span style=color:#e6db74>&#34;Number of spoke agent: 3&#34;</span>
+    oc patch provisioning provisioning-configuration --type merge -p <span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;watchAllNamespaces&#34;: true}}&#39;</span>
+    . ./04-create-new-vm.sh
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME1/</span>$OC_SPOKE_NAME<span style=color:#e6db74>-1/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME2/</span>$OC_SPOKE_NAME<span style=color:#e6db74>-2/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME3/</span>$OC_SPOKE_NAME<span style=color:#e6db74>-3/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/INSTALLER_IP/</span>$IP_INSTALLER<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT1/</span>$agent1<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT2/</span>$agent2<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT3/</span>$agent3<span style=color:#e6db74>/g&#34;</span> 05-BMhost-multinode.yml
+    oc apply -f 05-BMhost-multinode.yml
+<span style=color:#66d9ef>else</span>
+    echo <span style=color:#e6db74>&#34;Number of spoke agent: 1&#34;</span>
+    oc patch provisioning provisioning-configuration --type merge -p <span style=color:#e6db74>&#39;{&#34;spec&#34;:{&#34;watchAllNamespaces&#34;: true}}&#39;</span>
+    . ./04-create-new-vm-sno.sh
+    sed -i <span style=color:#e6db74>&#34;s/OC_SPOKE_NAME/</span>$OC_SPOKE_NAME<span style=color:#e6db74>/g&#34;</span> 99-BMhost-sno.yml
+    sed -i <span style=color:#e6db74>&#34;s/INSTALLER_IP/</span>$IP_INSTALLER<span style=color:#e6db74>/g&#34;</span> 99-BMhost-sno.yml
+    sed -i <span style=color:#e6db74>&#34;s/AGENT1/</span>$agent1<span style=color:#e6db74>/g&#34;</span> 99-BMhost-sno.yml
+    oc apply -f 99-BMhost-sno.yml
+<span style=color:#66d9ef>fi</span>
+</code></pre></div><p>The BMH manifest looks like:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml>---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>v1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Secret</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>bmc-secret1</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+<span style=color:#f92672>data</span>:
+  <span style=color:#f92672>password</span>: ---<span style=color:#ae81ff>redacted--- </span> <span style=color:#75715e># replace with your password</span>
+  <span style=color:#f92672>username</span>: ---<span style=color:#ae81ff>redacted--- </span> <span style=color:#75715e># replace with your username</span>
+<span style=color:#f92672>type</span>: <span style=color:#ae81ff>Opaque</span>
+
+
+---
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>metal3.io/v1alpha1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>BareMetalHost</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-agent1</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>infraenvs.agent-install.openshift.io</span>: <span style=color:#e6db74>&#34;lab-env&#34;</span>   <span style=color:#75715e># this is the reference for the infraenv in the cluster</span>
+  <span style=color:#f92672>annotations</span>:
+    <span style=color:#f92672>inspect.metal3.io</span>: <span style=color:#ae81ff>disabled</span>
+    <span style=color:#f92672>bmac.agent-install.openshift.io/hostname</span>: <span style=color:#e6db74>&#34;OC_SPOKE_NAME&#34;</span>  <span style=color:#75715e># replace with your hostname</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>online</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bmc</span>:
+    <span style=color:#f92672>address</span>: <span style=color:#ae81ff>redfish-virtualmedia+http://HTTPD_SERVER_IP:8000/redfish/v1/Systems/AGENT1  </span> <span style=color:#75715e># replace with the ip bmc data and the UUID of the VM</span>
+    <span style=color:#f92672>credentialsName</span>: <span style=color:#ae81ff>bmc-secret1</span>
+    <span style=color:#f92672>disableCertificateVerification</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>bootMACAddress</span>: <span style=color:#ae81ff>ee:bb:aa:ee:1e:1a  </span> <span style=color:#75715e># replace with the mac address of the VM</span>
+  <span style=color:#f92672>automatedCleaningMode</span>: <span style=color:#ae81ff>disabled</span>
+</code></pre></div><h2 id=verify-the-agent-boot-up-process>Verify the agent boot up process</h2>
+<p>The important thing is to verify that the column cluster is empty. That&rsquo;s exactly what we are expecting to see, in order to have a node available to be added later to the cluster.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>$ oc get bmh -owide
+NAME         STATUS   STATE         CONSUMER   BMC                                                                                                        HARDWARE_PROFILE   ONLINE   ERROR
+lab-agent1   OK       provisioned              redfish-virtualmedia+http://192.168.150.239:8000/redfish/v1/Systems/978bfcac-a040-45f4-9e31-6c7647720973   unknown            true
+</code></pre></div><p>The agent once has been discovered and the cluster column is empty:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>$ oc get agent -owide
+NAME                                   CLUSTER   APPROVED   ROLE          STAGE   HOSTNAME    REQUESTED HOSTNAME
+978bfcac-a040-45f4-9e31-6c7647720973             true       auto-assign           localhost   spoke-1
+</code></pre></div><h2 id=simulate-late-binding-to-add-node-to-the-cluster>Simulate late binding to add node to the cluster</h2>
+<p>Imagine we want to add this node to the cluster after some time (i.e. like a pool of nodes ready to be added, auto-scaling or something).
+If we want to add to the cluster we need to do the following:</p>
+<ul>
+<li>Create cluster deployment</li>
+<li>Create image set</li>
+<li>Create agent cluster install</li>
+</ul>
+<p>After that, edit the agent to set the cluster reference to the cluster deployment. You could do with a patch command or edit the agent manifest on the fly. I did it on the fly just to make clear code to show you the manifest at the end of the process:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#75715e># Please edit the object below. Lines beginning with a &#39;#&#39; will be ignored,</span>
+<span style=color:#75715e># and an empty file will abort the edit. If an error occurs while saving this file will be</span>
+<span style=color:#75715e># reopened with the relevant failures.</span>
+<span style=color:#75715e>#</span>
+<span style=color:#f92672>apiVersion</span>: <span style=color:#ae81ff>agent-install.openshift.io/v1beta1</span>
+<span style=color:#f92672>kind</span>: <span style=color:#ae81ff>Agent</span>
+<span style=color:#f92672>metadata</span>:
+  <span style=color:#f92672>creationTimestamp</span>: <span style=color:#e6db74>&#34;2021-09-29T09:47:31Z&#34;</span>
+  <span style=color:#f92672>finalizers</span>:
+  - <span style=color:#ae81ff>agent.agent-install.openshift.io/ai-deprovision</span>
+  <span style=color:#f92672>generation</span>: <span style=color:#ae81ff>2</span>
+  <span style=color:#f92672>labels</span>:
+    <span style=color:#f92672>agent-install.openshift.io/bmh</span>: <span style=color:#ae81ff>lab-agent1</span>
+    <span style=color:#f92672>infraenvs.agent-install.openshift.io</span>: <span style=color:#ae81ff>lab-env</span>
+  <span style=color:#f92672>name</span>: <span style=color:#ae81ff>978bfcac-a040-45f4-9e31-6c7647720973</span>
+  <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer</span>
+  <span style=color:#f92672>resourceVersion</span>: <span style=color:#e6db74>&#34;41964&#34;</span>
+  <span style=color:#f92672>uid</span>: <span style=color:#ae81ff>23540da4-4f0d-4aec-972b-71f1c501aa30</span>
+<span style=color:#f92672>spec</span>:
+  <span style=color:#f92672>approved</span>: <span style=color:#66d9ef>true</span>
+  <span style=color:#f92672>hostname</span>: <span style=color:#ae81ff>spoke-1</span>
+  <span style=color:#f92672>role</span>: <span style=color:#e6db74>&#34;&#34;</span>
+  <span style=color:#f92672>clusterDeploymentName</span>:                    <span style=color:#75715e># this is the reference for the cluster deployment in the cluster</span>
+    <span style=color:#f92672>name</span>: <span style=color:#ae81ff>lab-cluster                      </span> <span style=color:#75715e># this is the reference for the cluster deployment name in the cluster</span>
+    <span style=color:#f92672>namespace</span>: <span style=color:#ae81ff>assisted-installer          </span> <span style=color:#75715e># this is the reference for the cluster deployment namespace in the cluster</span>
+<span style=color:#f92672>status</span>:
+  <span style=color:#f92672>conditions</span>:
+  - <span style=color:#f92672>lastTransitionTime</span>: <span style=color:#e6db74>&#34;2021-09-29T09:47:32Z&#34;</span>
+    <span style=color:#f92672>message</span>: <span style=color:#ae81ff>The Spec has been successfully applied</span>
+    <span style=color:#f92672>reason</span>: <span style=color:#ae81ff>SyncOK</span>
+    <span style=color:#f92672>status</span>: <span style=color:#e6db74>&#34;True&#34;</span>
+    <span style=color:#f92672>type</span>: <span style=color:#ae81ff>SpecSynced</span>
+</code></pre></div><h2 id=verify-the-cluster-column-now-is-the-cluster-reference-name>Verify the cluster column now is the cluster reference name</h2>
+<p>Now, to finish the process we need to validate that the cluster column (looking the agent cr) is now with the cluster reference name to be added to the cluster successfully.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>$ oc get agent -owide
+NAME                                   CLUSTER       APPROVED   ROLE          STAGE   HOSTNAME    REQUESTED HOSTNAME
+978bfcac-a040-45f4-9e31-6c7647720973   lab-cluster   true       auto-assign           localhost   spoke-1
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/ title="Day2 with spoke cluster to add worker nodes"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Day2 with spoke cluster to add worker nodes</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/ title="Remote Worker Node in Day2 spoke cluster to add worker nodes">Next - Remote Worker Node in Day2 spoke cluster to add worker nodes <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li class=active><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>

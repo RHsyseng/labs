@@ -1,0 +1,355 @@
+<!doctype html><html>
+<head><meta charset=utf-8>
+<meta http-equiv=x-ua-compatible content="IE=edge">
+<meta name=viewport content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>kcli with Metal³ and IPv4 connected - Labs@Sysdeseng</title>
+<meta name=description content="Labs to play with Edge and Telco 5G sustaining technologies">
+<meta name=generator content="Hugo 0.92.1">
+<link href=https://pages.sysdeseng.com/labs/index.xml rel=alternate type=application/rss+xml>
+<link rel=canonical href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/theme.min.css>
+<script src=https://use.fontawesome.com/releases/v5.0.6/js/all.js></script>
+<link rel=stylesheet href=https://pages.sysdeseng.com/labs/css/chroma.min.css>
+<script src=https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/jquery.easing@1.4.1/jquery.easing.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/clipboard@2.0.6/dist/clipboard.min.js></script>
+<script src=https://pages.sysdeseng.com/labs/js/bundle.js></script><style>:root{--custom-font-color:#ffffff;--custom-background-color:#cc0000}</style>
+<meta property="og:title" content="kcli with Metal³ and IPv4 connected">
+<meta property="og:description" content="References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-metal3.yml  AUTOMATIC installation with this three parameters, the installation will be automatic from scratch to finish:
+ lab:true launch_steps: true deploy_openshift: true  Edit your lab-metal3.yml maybe you could copy from file .example in kcli plan:
+lab: true version: ci provisioning_enable: false virtual_protocol: redfish uefi_legacy: true virtual_masters: true virtual_workers: false launch_steps: true deploy_openshift: true cluster: test-ci domain: alklabs.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/"><meta property="og:image" content="https://pages.sysdeseng.com/android-chrome-192x192.png"><meta property="article:section" content="OCP">
+<meta property="og:site_name" content="Labs index">
+<meta name=twitter:card content="summary_large_image">
+<meta name=twitter:image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta name=twitter:title content="kcli with Metal³ and IPv4 connected">
+<meta name=twitter:description content="References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-metal3.yml  AUTOMATIC installation with this three parameters, the installation will be automatic from scratch to finish:
+ lab:true launch_steps: true deploy_openshift: true  Edit your lab-metal3.yml maybe you could copy from file .example in kcli plan:
+lab: true version: ci provisioning_enable: false virtual_protocol: redfish uefi_legacy: true virtual_masters: true virtual_workers: false launch_steps: true deploy_openshift: true cluster: test-ci domain: alklabs.">
+<meta itemprop=name content="kcli with Metal³ and IPv4 connected">
+<meta itemprop=description content="References:  Lab Folder: https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal Paramfile (Inside the lab folder the paramfile to be used): lab-metal3.yml  AUTOMATIC installation with this three parameters, the installation will be automatic from scratch to finish:
+ lab:true launch_steps: true deploy_openshift: true  Edit your lab-metal3.yml maybe you could copy from file .example in kcli plan:
+lab: true version: ci provisioning_enable: false virtual_protocol: redfish uefi_legacy: true virtual_masters: true virtual_workers: false launch_steps: true deploy_openshift: true cluster: test-ci domain: alklabs.">
+<meta itemprop=wordCount content="622"><meta itemprop=image content="https://pages.sysdeseng.com/android-chrome-192x192.png">
+<meta itemprop=keywords content="IPI,Metal³,labs,IPv4,kcli,"></head>
+<body><div class=container><header>
+<h1>Labs@Sysdeseng</h1>
+<p class=description>Labs to play with Edge and Telco 5G sustaining technologies</p>
+</header>
+<div class=global-menu>
+<nav>
+<ul>
+<li><a href=/labs/search>🔍search</a></li></ul>
+</nav>
+</div>
+<div class=content-container>
+<main><h1>kcli with Metal³ and IPv4 connected</h1>
+<aside class=table_of_contents>
+<h5>Table of Contents</h5><nav id=TableOfContents>
+<ul>
+<li>
+<ul>
+<li><a href=#automatic-installation>AUTOMATIC installation</a></li>
+<li><a href=#edit-your-lab-metal3yml>Edit your lab-metal3.yml</a></li>
+<li><a href=#manual-installation>MANUAL installation</a></li>
+</ul>
+</li>
+</ul>
+</nav></aside>
+<h1 id=references>References:</h1>
+<ul>
+<li>Lab Folder: <a href=https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal>https://github.com/RHsyseng/labs-index/tree/master/lab-kcli-ipi-baremetal</a></li>
+<li><code>Paramfile</code> (Inside the lab folder the <code>paramfile</code> to be used): <strong><a href=https://github.com/RHsyseng/labs-index/blob/master/lab-kcli-ipi-baremetal/lab-metal3.yml>lab-metal3.yml</a></strong></li>
+</ul>
+<h3 id=automatic-installation>AUTOMATIC installation</h3>
+<p>with this three parameters, the installation will be automatic from scratch to finish:</p>
+<ul>
+<li><code>lab:true</code></li>
+<li><code>launch_steps: true</code></li>
+<li><code>deploy_openshift: true</code></li>
+</ul>
+<h3 id=edit-your-lab-metal3yml>Edit your lab-metal3.yml</h3>
+<p>maybe you could copy from file .example in kcli plan:</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>lab</span>: <span style=color:#66d9ef>true</span>
+<span style=color:#f92672>version</span>: <span style=color:#ae81ff>ci</span>
+<span style=color:#f92672>provisioning_enable</span>: <span style=color:#66d9ef>false</span>
+<span style=color:#f92672>virtual_protocol</span>: <span style=color:#ae81ff>redfish</span>
+<span style=color:#f92672>uefi_legacy</span>: <span style=color:#66d9ef>true</span>
+<span style=color:#f92672>virtual_masters</span>: <span style=color:#66d9ef>true</span>
+<span style=color:#f92672>virtual_workers</span>: <span style=color:#66d9ef>false</span>
+<span style=color:#f92672>launch_steps</span>: <span style=color:#66d9ef>true</span>
+<span style=color:#f92672>deploy_openshift</span>: <span style=color:#66d9ef>true</span>
+<span style=color:#f92672>cluster</span>: <span style=color:#ae81ff>test-ci</span>
+<span style=color:#f92672>domain</span>: <span style=color:#ae81ff>alklabs.com</span>
+<span style=color:#f92672>baremetal_cidr</span>: <span style=color:#ae81ff>192.168.150.0</span><span style=color:#ae81ff>/24</span>
+<span style=color:#f92672>baremetal_net</span>: <span style=color:#ae81ff>bare-net</span>
+<span style=color:#f92672>provisioning_net</span>: <span style=color:#ae81ff>lab-prov</span>
+<span style=color:#f92672>virtual_masters_memory</span>: <span style=color:#ae81ff>16000</span>
+<span style=color:#f92672>virtual_masters_numcpus</span>: <span style=color:#ae81ff>16</span>
+<span style=color:#f92672>virtual_workers_deploy</span>: <span style=color:#66d9ef>false</span>
+<span style=color:#f92672>api_ip</span>: <span style=color:#ae81ff>192.168.150.253</span>
+<span style=color:#f92672>ingress_ip</span>: <span style=color:#ae81ff>192.168.150.252</span>
+<span style=color:#f92672>ipmi_user</span>: <span style=color:#ae81ff>amorgant</span>
+<span style=color:#f92672>ipmi_password</span>: <span style=color:#ae81ff>alknopfler</span>
+<span style=color:#f92672>baremetal_ips</span>:
+  - <span style=color:#ae81ff>192.168.150.10</span>
+  - <span style=color:#ae81ff>192.168.150.11</span>
+  - <span style=color:#ae81ff>192.168.150.12</span>
+<span style=color:#f92672>baremetal_macs</span>:
+  - <span style=color:#ae81ff>aa:aa:aa:ba:cc:11</span>
+  - <span style=color:#ae81ff>aa:aa:aa:ba:cc:22</span>
+  - <span style=color:#ae81ff>aa:aa:aa:ba:cc:33</span>
+</code></pre></div><p>Just to launch everything and wait until finish (without any manual interaction):</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-sh data-lang=sh>kcli create plan --paramfile<span style=color:#f92672>=</span>lab-metal3.yml -P version<span style=color:#f92672>=</span>ci -P openshift_image<span style=color:#f92672>=</span><span style=color:#e6db74>${</span>{github.event.inputs.OC_RELEASE<span style=color:#e6db74>}</span><span style=color:#f92672>}</span> -P cluster<span style=color:#f92672>=</span><span style=color:#e6db74>${</span>{github.event.inputs.OC_CLUSTER_NAME<span style=color:#e6db74>}</span><span style=color:#f92672>}</span> <span style=color:#e6db74>${</span>{github.event.inputs.OC_CLUSTER_NAME<span style=color:#e6db74>}</span><span style=color:#f92672>}</span>
+</code></pre></div><h3 id=manual-installation>MANUAL installation</h3>
+<p>As you can see in the repository, you could change the flag:</p>
+<ul>
+<li>launch_steps: false</li>
+</ul>
+<p>And the plan will be launched, the installation VM will be created and the rest of VMs will be off until you start to launch script by yourself.
+At this point will be manually deployed as a lab environment.</p>
+<p><strong>Note</strong> maybe some steps will not be necessary.</p>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell><span style=color:#f92672>[</span>root@qct-d14u09 lab-kcli-ipi-baremetal<span style=color:#f92672>]</span><span style=color:#75715e># tree</span>
+.
+|-- 00_virtual.sh.ipmi
+|-- 00_virtual.sh.redfish
+|-- 01_patch_installconfig.sh
+|-- 02_packages.sh
+|-- 03_network.sh
+|-- 04_get_clients.sh
+|-- 05_cache.sh
+|-- 06_disconnected.sh
+|-- 07_nbde.sh
+|-- 08_ntp.sh
+|-- 09_deploy_openshift.sh
+|-- 10_nfs.sh
+|-- 10_nfs.yml
+|-- 99-openshift-chrony.sample.yaml
+|-- 99-openshift-ingress-controller-master.yaml
+|-- 99-openshift-tang-encryption-clevis.sample.yaml
+|-- 99-openshift-tang-encryption-ka.sample.yaml
+|-- Jenkinsfile
+|-- Jenkinsfile.ocp
+|-- README.md
+|-- clouds.yaml
+|-- deploy.sh
+|-- extra_worker.yml
+|-- fakenetworks.yml
+|-- helpers
+|   |-- build.sh
+|   |-- clean.sh
+|   |-- extras.sh
+|   |-- ipmi.py
+|   |-- pull_and_push.sh
+|   |-- redfish.py
+|   |-- set_ironic_creds.sh
+|   |-- sushy.conf
+|   |-- sushy.py
+|   |-- sushy.service
+|   <span style=color:#e6db74>`</span>-- vbmc.py
+|-- install-config.yaml
+|-- lab-metal3.yml
+|-- lab-withoutMetal3.yml
+|-- lab.yml
+|-- lab_ipv6.yml
+|-- manifests
+|   <span style=color:#e6db74>`</span>-- README.md
+|-- masters.yml
+|-- notify.sh
+|-- okd.yml
+|-- openshift_pull.json
+|-- parameters.yml.sample
+|-- parameters_virtual.yml.sample
+<span style=color:#e6db74>`</span>-- workers.yml
+
+</code></pre></div><h1 id=workflow-snip>Workflow snip</h1>
+<div class=highlight><pre tabindex=0 style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-yaml data-lang=yaml><span style=color:#f92672>name</span>: <span style=color:#ae81ff>ocp_bm_ipi+Hive+AI+spoke</span>
+<span style=color:#f92672>on</span>:
+  <span style=color:#f92672>workflow_dispatch</span>:
+    <span style=color:#f92672>inputs</span>:
+      <span style=color:#f92672>OC_RELEASE</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;ocp release: -&gt; registry.ci.openshift.org/ocp/release:4.8.0-0.nightly-2021-04-30-154520 &lt;-&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+      <span style=color:#f92672>OC_DEPLOY_OCP</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Deploy OCP? [yes|no]&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;yes&#34;</span>
+      <span style=color:#f92672>OC_DEPLOY_METAL</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Deploy with METAL3? [yes|no]&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;yes&#34;</span>
+      <span style=color:#f92672>OC_DEPLOY_LS</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Deploy LocalStorage? [yes|no]&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;yes&#34;</span>
+      <span style=color:#f92672>OC_DEPLOY_HIVE</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Deploy Hive? [yes|no]&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;yes&#34;</span>
+      <span style=color:#f92672>OC_DEPLOY_AI</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Deploy AI? [yes|no]&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;yes&#34;</span>
+      <span style=color:#f92672>OC_DEPLOY_SPOKE</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Deploy Spoke Cluster? [yes|no]&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;yes&#34;</span>
+      <span style=color:#f92672>OC_MASTER_SPOKE</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Number of Master spoke (SNO/Multinode) -&gt; 1 &lt;-&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;1&#34;</span>
+      <span style=color:#f92672>OC_CLUSTER_NAME</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Clusters Name -&gt; myCluster &lt;-&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>false</span>
+        <span style=color:#f92672>default</span>: <span style=color:#e6db74>&#34;test-ci&#34;</span>
+      <span style=color:#f92672>RUNNER</span>:
+        <span style=color:#f92672>description</span>: <span style=color:#e6db74>&#34;Github Action Runner Name&#34;</span>
+        <span style=color:#f92672>required</span>: <span style=color:#66d9ef>true</span>
+
+<span style=color:#f92672>env</span>:
+  <span style=color:#f92672>DEPLOY_OCP_DIR</span>: <span style=color:#ae81ff>lab-kcli-ipi-baremetal</span>
+  <span style=color:#f92672>LOCALSTORAGE_DIR</span>: <span style=color:#ae81ff>deploy-LocalStorage-operator</span>
+  <span style=color:#f92672>AI_DIR</span>: <span style=color:#ae81ff>deploy-AssistedInstaller-operator</span>
+  <span style=color:#f92672>HIVE_DIR</span>: <span style=color:#ae81ff>deploy-hive-operator</span>
+  <span style=color:#f92672>SHARED_DIR</span>: <span style=color:#ae81ff>shared-utils</span>
+  <span style=color:#f92672>SPOKE_AI_DIR</span>: <span style=color:#ae81ff>deploy-spoke-over-AI</span>
+
+<span style=color:#f92672>jobs</span>:
+  <span style=color:#f92672>requirements</span>:
+    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>${{github.event.inputs.RUNNER}}</span> <span style=color:#75715e>#tag with your runner tag</span>
+
+    <span style=color:#f92672>steps</span>:
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install kcli and skopeo</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          dnf -y copr enable karmab/kcli
+</span><span style=color:#e6db74>          dnf -y install kcli skopeo git
+</span><span style=color:#e6db74>          kcli create pool -p /var/lib/libvirt/images default
+</span><span style=color:#e6db74>          sudo setfacl -m u:$(id -un):rwx /var/lib/libvirt/images
+</span><span style=color:#e6db74>          kcli download image centos8</span>          
+
+      - <span style=color:#f92672>uses</span>: <span style=color:#ae81ff>actions/checkout@v2</span> <span style=color:#75715e># create a checkout (pull repository) in the runner working_dir (usually _work)</span>
+      - <span style=color:#f92672>run</span>: <span style=color:#ae81ff>git pull origin ${GITHUB_REF##*/}</span>
+
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Install clients</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          cd ${{env.SHARED_DIR}}
+</span><span style=color:#e6db74>          ./get_clients.sh</span>          
+
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Setup the pull-secret</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          cd ${{env.DEPLOY_OCP_DIR}}
+</span><span style=color:#e6db74>          echo ${{secrets.AMORGANT_PULL_SECRET}} | tr -d [:space:] &gt; openshift_pull.json</span>          
+
+  <span style=color:#f92672>deploy-ocp</span>:
+    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>requirements</span> <span style=color:#75715e># create dependencies between jobs</span>
+    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>${{github.event.inputs.RUNNER}}</span>
+    <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event.inputs.OC_DEPLOY_OCP == &#39;yes&#39;</span>
+    <span style=color:#f92672>steps</span>:
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy using kcli metal3</span>
+        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event.inputs.OC_DEPLOY_METAL == &#39;yes&#39;</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          cd ${{env.DEPLOY_OCP_DIR}}
+</span><span style=color:#e6db74>          kcli create plan --paramfile=lab-metal3.yml -P version=ci -P openshift_image=${{github.event.inputs.OC_RELEASE}} -P cluster=${{github.event.inputs.OC_CLUSTER_NAME}} ${{github.event.inputs.OC_CLUSTER_NAME}}</span>          
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>Deploy using kcli without metal3</span>
+        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event.inputs.OC_DEPLOY_METAL != &#39;yes&#39;</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          cd ${{env.DEPLOY_OCP_DIR}}
+</span><span style=color:#e6db74>          kcli create kube openshift --paramfile lab-withoutMetal3.yml -P tag=${{github.event.inputs.OC_RELEASE}} -P cluster=${{github.event.inputs.OC_CLUSTER_NAME}} ${{github.event.inputs.OC_CLUSTER_NAME}}</span>          
+
+  <span style=color:#f92672>verify</span>:
+    <span style=color:#f92672>needs</span>: <span style=color:#ae81ff>deploy-ocp</span>
+    <span style=color:#f92672>runs-on</span>: <span style=color:#ae81ff>${{github.event.inputs.RUNNER}}</span>
+    <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event.inputs.OC_DEPLOY_OCP == &#39;yes&#39;</span>
+    <span style=color:#f92672>steps</span>:
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>verify installation success with metal3</span>
+        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event.inputs.OC_DEPLOY_METAL == &#39;yes&#39;</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          cd ${{env.SHARED_DIR}}
+</span><span style=color:#e6db74>          ./wait_until_ocp_bm_ready.sh ${{github.event.inputs.OC_CLUSTER_NAME}} 3 ${{env.DEPLOY_OCP_DIR}}</span>          
+      - <span style=color:#f92672>name</span>: <span style=color:#ae81ff>verify installation success without metal3</span>
+        <span style=color:#f92672>if</span>: <span style=color:#ae81ff>github.event.inputs.OC_DEPLOY_METAL != &#39;yes&#39;</span>
+        <span style=color:#f92672>run</span>: |<span style=color:#e6db74>
+</span><span style=color:#e6db74>          cd ${{env.SHARED_DIR}}
+</span><span style=color:#e6db74>          ./wait_ocp.sh ${{github.event.inputs.OC_CLUSTER_NAME}} 1</span>          
+</code></pre></div><div class=edit-meta>
+<br></div><nav class=pagination><a class="nav nav-prev" href=https://pages.sysdeseng.com/labs/ocp/ipi/ title="Installer Provisioned Infrastructure (IPI)"><i class="fas fa-arrow-left" aria-hidden=true></i>&nbsp;Prev - Installer Provisioned Infrastructure (IPI)</a>
+<a class="nav nav-next" href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/ title="kcli with Metal³ and IPv6 disconnected">Next - kcli with Metal³ and IPv6 disconnected <i class="fas fa-arrow-right" aria-hidden=true></i></a>
+</nav><footer><p class=powered>Powered by <a href=https://gohugo.io>Hugo</a>. Theme by <a href=https://themes.gohugo.io/hugo-theme-techdoc/>TechDoc</a>. Designed by <a href=https://github.com/thingsym/hugo-theme-techdoc>Thingsym</a>.</p>
+</footer>
+</main>
+<div class=sidebar>
+<nav class=slide-menu>
+<ul>
+<li><a href=https://pages.sysdeseng.com/labs>Home</a></li>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/ocp/>Labs to install an OpenShift cluster<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class="parent has-sub-menu"><a href=https://pages.sysdeseng.com/labs/ocp/ipi/>Installer Provisioned Infrastructure (IPI)<span class="mark opened">-</span></a>
+<ul class=sub-menu>
+<li class=active><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv4con/>kcli with Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-metal3-ipv6disc/>kcli with Metal³ and IPv6 disconnected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/kcli-ipi-withoutmetal3-ipv4con/>kcli without Metal³ and IPv4 connected</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/ipi/openshift-4.7-aws/>OpenShift 4.7 on AWS</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/ocp/upi/>User Provisioned Infrastructure (UPI)<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/upi/sno-upi-baremetal/>Manual SNO on baremetal</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/ocp/pull-secret-validator/>Pull Secret Validator tool</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/>Deploy Operators and Resources<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/operator/>Operator<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/localstorage/>LocalStorage</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/hive/>Hive</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/operator/assistedinstaller/>Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/>Hub & Spoke cluster<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/acm/>Using Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/hub-spoke/ai/>Using Assisted Installer (AI)</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/>BareMetalHost<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-acm/>Virtual over ACM</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/baremetalhost/virtual-over-ai/>Virtual over Assisted Installer</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/>RemoteWorkerNode<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/day2-spoke-worker/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-using-ai-crd/>Day2 with spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/late-binding/>Late Binding adding new agents</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-day2-spoke-worker/>Remote Worker Node in Day2 spoke cluster to add worker nodes</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/remoteworkernode/rwn-to-ai-using-aicli-api/>RWN to Assisted Installer using AICLI API</a></li>
+</ul>
+</li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/sno-acm-spokesno-scripts/>Deploy a Hub SNO with ACM and Spoke SNO on top of it using scripts</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/lab-physical-ipv6disc/>Physical IPv6 Disconnected Lab</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/rhacm/>Red Hat Advanced Cluster Management (ACM)</a></li>
+<li><a href=https://pages.sysdeseng.com/labs/deploy/ztp-the-hard-way/>ZTP The Hard Way</a></li>
+</ul>
+</li>
+<li class=has-sub-menu><a href=https://pages.sysdeseng.com/labs/vocabulary/>Vocabularies<span class="mark closed">+</span></a>
+<ul class=sub-menu>
+<li><a href=https://pages.sysdeseng.com/labs/vocabulary/vocabulary/>Vocabulary</a></li>
+</ul>
+</li>
+</ul>
+</nav>
+<div class=sidebar-footer></div>
+</div>
+</div><a href=# id=backtothetop-fixed class=backtothetop data-backtothetop-duration=600 data-backtothetop-easing=easeOutQuart data-backtothetop-fixed-fadein=1000 data-backtothetop-fixed-fadeout=1000 data-backtothetop-fixed-bottom=10 data-backtothetop-fixed-right=20>
+<span class="fa-layers fa-fw">
+<i class="fas fa-circle"></i>
+<i class="fas fa-arrow-circle-up"></i>
+</span></a>
+</div>
+</body>
+</html>
